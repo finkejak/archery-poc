@@ -1,0 +1,13 @@
+.container {
+  position: relative;
+  width: 640px;
+  height: 480px;
+}
+.input_video {
+  display: none; /* Versteckt das rohe Video */
+}
+.output_canvas {
+  position: absolute;
+  left: 0;
+  top: 0;
+}
