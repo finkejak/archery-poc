@@ -2,12 +2,13 @@
   position: relative;
   width: 640px;
   height: 480px;
+  border: 1px solid black; /* Hilfreich zum Debuggen */
 }
-.input_video {
-  display: none; /* Versteckt das rohe Video */
-}
+
 .output_canvas {
   position: absolute;
   left: 0;
   top: 0;
+  width: 640px;
+  height: 480px;
 }
