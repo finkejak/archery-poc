@@ -72,20 +72,6 @@ pose.setOptions({
 
 pose.onResults(onResults);
 
-if (results.poseLandmarks) {
-
-    drawConnectors(canvasCtx, results.poseLandmarks, POSE_CONNECTIONS,
-                   {color: '#00FF00', lineWidth: 4});
-    drawLandmarks(canvasCtx, results.poseLandmarks,
-                  {color: '#FF0000', lineWidth: 2});
-
-  console.log(results.poseLandmarks);
-
-  const nose = results.poseLandmarks[0];
-  console.log("Nase X:", nose.x, "Nase Y:", nose.y);
-
-}
-
 const camera = new Camera(videoElement, {
   onFrame: async () => {
     await pose.send({image: videoElement});
