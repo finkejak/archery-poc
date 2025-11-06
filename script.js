@@ -225,6 +225,12 @@ function onLiveResults(results) {
 
 // Zeichnet das Bild skaliert (wie im letzten Schritt)
 function drawScaledImage(image) {
+
+  if (!image || !image.width || !image.height) {
+    console.error("drawScaledImage: Ungültiges Bild-Objekt empfangen.");
+    return;
+  }
+
   const videoWidth = image.width;
   const videoHeight = image.height;
   const canvasWidth = canvasElement.width;
@@ -236,7 +242,7 @@ function drawScaledImage(image) {
   
   if (videoAspect > canvasAspect) {
     drawWidth = canvasWidth;
-    drawHeight = canvasWidth / videoVideoAspect;
+    drawHeight = canvasWidth / videoAspect;
     offsetX = 0;
     offsetY = (canvasHeight - drawHeight) / 2;
   } else {
