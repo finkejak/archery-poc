@@ -166,13 +166,6 @@ const camera = new Camera(videoElement, {
   height: 480
 });
 
-// Event-Listener für den Start-Button
-startTrainingButton.addEventListener('click', () => {
-  camera.start();
-  feedbackText.textContent = "Training läuft... Position einnehmen.";
-  playBeep(220, 0.1); // Starte einen leisen, tiefen "Such-Ton"
-});
-
 // Wird 30x pro Sekunde vom Live-Video aufgerufen
 function onLiveResults(results) {
   // Zuerst das Kamerabild zeichnen
