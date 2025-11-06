@@ -1,8 +1,19 @@
+body {
+  font-family: Arial, sans-serif;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
 .container {
   position: relative;
   width: 640px;
   height: 480px;
-  border: 1px solid black; /* Hilfreich zum Debuggen */
+  border: 1px solid black;
+}
+
+.input_video {
+  display: none; /* Video-Element verstecken, wir zeichnen aufs Canvas */
 }
 
 .output_canvas {
