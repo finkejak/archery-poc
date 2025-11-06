@@ -93,6 +93,10 @@ function onStaticResults(results) {
     const idealWrist = pose[15];
     const idealBowArmAngle = calculateAngle(idealShoulder, idealElbow, idealWrist);
 
+    if (idealShoulder.visibility < 0.5 || idealElbow.visibility < 0.5 || idealWrist.visibility < 0.5) {
+      throw new Error("Wichtige Gelenke (Bogenarm) nicht deutlich sichtbar.");
+    }
+
     // TO-DO: Hier alle anderen Winkel (Zughand, Körper etc.) auch berechnen
     
     idealPoseAngles = {
@@ -184,6 +188,11 @@ function onLiveResults(results) {
     const liveWrist = livePose[15];
 
     const liveBowArmAngle = calculateAngle(liveShoulder, liveElbow, liveWrist);
+
+    if (liveShoulder.visibility < 0.5 || liveElbow.visibility < 0.5 || liveWrist.visibility < 0.5) {
+    // Wenn Arm nicht da, wirf einen "Fehler", um ins catch zu springen
+      throw new Error("Bogenarm nicht im Bild");
+    }
     
     // --- DER KERN-VERGLEICH ---
     const idealAngle = idealPoseAngles.bowArm;
@@ -265,17 +274,16 @@ function drawSkeleton(landmarks, color, lineWidth = 4) {
   // Hol dir die Skalierungs-Faktoren
   const { drawWidth, drawHeight, offsetX, offsetY } = canvasElement.drawConfig;
 
-  // Skaliere die Punkte auf die Canvas-Größe
-  const scaledLandmarks = landmarks.map(landmark => {
-    return {
-      x: landmark.x * drawWidth + offsetX,
-      y: landmark.y * drawHeight + offsetY,
-    };
-  });
+  canvasCtx.save();
+
+  canvasCtx.translate(offsetX, offsetY);
+  canvasCtx.scale(drawWidth, drawHeight);
   
   // Zeichne die Linien und Punkte
-  drawConnectors(canvasCtx, scaledLandmarks, POSE_CONNECTIONS,
+  drawConnectors(canvasCtx, landmarks, POSE_CONNECTIONS,
                  {color: color, lineWidth: lineWidth});
-  drawLandmarks(canvasCtx, scaledLandmarks,
+  drawLandmarks(canvasCtx, landmarks,
                 {color: '#FFFFFF', lineWidth: 2, radius: 2}); // Weiße kleine Punkte
+
+  canvasCtx.restore();
 }
