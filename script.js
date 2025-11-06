@@ -49,8 +49,14 @@ const canvasCtx = canvasElement.getContext('2d');
 const imageInputElement = document.getElementById('imageInput');
 const imageElement = document.getElementById('loadedImage');
 const videoElement = document.getElementsByClassName('input_video')[0];
-const startTrainingButton = document.getElementById('startTrainingButton');
 const feedbackText = document.getElementById('feedback-text');
+
+const calibrationStep = document.getElementById('calibration-step');
+const trainingStep = document.getElementById('training-step');
+const confirmationArea = document.getElementById('confirmation-area');
+const confirmButton = document.getElementById('confirmButton');
+const retryButton = document.getElementById('retryButton');
+const calibrationResultText = document.getElementById('calibration-result-text');
 
 // --- 1. KALIBRIERUNGS-LOGIK (Statisches Bild) ---
 
@@ -68,16 +74,20 @@ poseStatic.onResults(onStaticResults); // Eigene Funktion für statische Ergebni
 
 // Wird aufgerufen, nachdem das Ideal-Bild analysiert wurde
 function onStaticResults(results) {
+
+  drawScaledImage(results.image); // Zeichne das Bild skaliert
+
   if (!results.poseLandmarks) {
     alert("Konnte keine Pose im Bild erkennen. Bitte versuche ein anderes Bild.");
     return;
   }
 
-  // Hol dir die Keypoints
-  const pose = results.poseLandmarks;
-  
+  drawSkeleton(results.poseLandmarks, '#0000FF'); // Blaues Skelett für "Ideal"
+
+
   // Berechne und speichere die Ideal-Winkel
   try {
+    const pose = results.poseLandmarks;
     const idealShoulder = pose[11];
     const idealElbow = pose[13];
     const idealWrist = pose[15];
@@ -90,18 +100,12 @@ function onStaticResults(results) {
       // z.B. drawArm: ...
     };
 
-    alert(`Kalibrierung erfolgreich! Bogenarm-Winkel ist ${idealBowArmAngle.toFixed(1)}°.`);
-    
-    // UI aktualisieren
-    document.getElementById('calibration-step').style.display = 'none';
-    document.getElementById('training-step').style.display = 'block';
-    
-    // Bild auf Canvas zeichnen (nur zur Kontrolle)
-    drawScaledImage(results.image);
-    drawSkeleton(results.poseLandmarks, '#0000FF'); // Blaues Skelett für "Ideal"
+    calibrationResultText.textContent = `Kalibrierung OK! Bogenarm-Winkel: ${idealBowArmAngle.toFixed(1)}°`;
+    confirmationArea.style.display = 'block';
+    imageInputElement.style.display = 'none'; // Verstecke den Upload-Button
 
   } catch (error) {
-    alert("Fehler bei der Winkel-Berechnung. Sind alle Gelenke sichtbar?");
+    alert("Fehler bei der Winkel-Berechnung. Sind alle Gelenke sichtbar? Bitte lade ein neues Bild hoch.");
     console.error(error);
   }
 }
@@ -120,6 +124,26 @@ imageElement.onload = async () => {
 };
 
 // --- 2. LIVE-TRAINING LOGIK ---
+
+retryButton.addEventListener('click', () => {
+  // Setze UI zurück
+  confirmationArea.style.display = 'none';
+  imageInputElement.style.display = 'block';
+  idealPoseAngles = null;
+  canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height); // Lösche das Canvas
+  imageInputElement.value = ""; // Setze File-Input zurück
+});
+
+confirmButton.addEventListener('click', () => {
+  // UI umschalten
+  calibrationStep.style.display = 'none';
+  trainingStep.style.display = 'block';
+  
+  // Kamera starten
+  camera.start();
+  feedbackText.textContent = "Position einnehmen...";
+  playBeep(220, 0.1); // Starte leisen Such-Ton
+});
 
 const poseLive = new Pose({locateFile: (file) => {
   return `https://cdn.jsdelivr.net/npm/@mediapipe/pose/${file}`;
