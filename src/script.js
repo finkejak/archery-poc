@@ -89,9 +89,7 @@ const trainingStep = document.getElementById("training-step");
 const confirmationArea = document.getElementById("confirmation-area");
 const confirmButton = document.getElementById("confirmButton");
 const retryButton = document.getElementById("retryButton");
-const calibrationResultText = document.getElementById(
-	"calibration-result-text"
-);
+const calibrationResultText = document.getElementById("calibration-result-text");
 
 // --- 1. KALIBRIERUNGS-LOGIK (Statisches Bild) ---
 
