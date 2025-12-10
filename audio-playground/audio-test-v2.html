@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Archery Audio Lab V2</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+    <style>
+        body { font-family: -apple-system, sans-serif; background: #1a1a1a; color: #e5e5e5; padding: 20px; max-width: 700px; margin: 0 auto; }
+        h1 { color: #a78bfa; text-align: center; margin-bottom: 30px; }
+        
+        /* Karten-Design */
+        .card { background: #262626; border: 1px solid #404040; border-radius: 12px; padding: 25px; margin-bottom: 25px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
+        .card h2 { margin-top: 0; font-size: 1.1rem; color: #a78bfa; border-bottom: 1px solid #404040; padding-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+        
+        /* Slider Styling */
+        .control-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; font-weight: 600; font-size: 0.85rem; color: #d4d4d4; }
+        input[type=range] { 
+            width: 100%; cursor: pointer; accent-color: #a78bfa; 
+            background: #404040; height: 6px; border-radius: 3px; outline: none;
+        }
+        
+        /* Buttons */
+        .toggle-btn { 
+            background: #404040; color: #fff; border: 1px solid #555; 
+            padding: 8px 16px; border-radius: 20px; cursor: pointer; font-size: 0.8rem; transition: all 0.2s;
+        }
+        .toggle-btn.active { background: #a78bfa; color: #000; border-color: #a78bfa; }
+        
+        /* Start Overlay */
+        #start-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); display: flex; justify-content: center; align-items: center; z-index: 100; flex-direction: column; }
+        #start-btn { font-size: 1.2rem; padding: 15px 30px; background: #a78bfa; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; }
+
+        .value-display { float: right; color: #a78bfa; font-family: monospace; }
+        .info { font-size: 0.75rem; color: #888; margin-bottom: 15px; display: block; }
+    </style>
+</head>
+<body>
+
+    <div id="start-overlay">
+        <h1 style="color: white;">Audio Lab V2</h1>
+        <button id="start-btn">Sound Engine starten</button>
+    </div>
+
+    <div class="card" style="border-color: #a78bfa;">
+        <h2>🎛️ Globale Akustik</h2>
+        <div class="control-group">
+            <label>Hall (Reverb) - Raumgröße <span id="val-reverb" class="value-display">20%</span></label>
+            <input type="range" id="slider-reverb" min="0" max="100" value="20">
+            <span class="info">Simuliert Entfernung und Raumgefühl.</span>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>
+            1. Rhythmus & Pitch 
+            <button id="btn-loop" class="toggle-btn">Start Loop</button>
+        </h2>
+        <span class="info">Wie die Einparkhilfe im Auto: Geschwindigkeit + Tonhöhe separat testen.</span>
+        
+        <div class="control-group">
+            <label>Tonhöhe (Pitch) <span id="val-pitch" class="value-display">440 Hz</span></label>
+            <input type="range" id="slider-pitch" min="200" max="1200" value="440">
+        </div>
+
+        <div class="control-group">
+            <label>Geschwindigkeit (Intervall) <span id="val-interval" class="value-display">0.5s</span></label>
+            <input type="range" id="slider-interval" min="50" max="1000" value="500">
+            <span class="info">Links: Schnell (Panik) | Rechts: Langsam (Entspannt)</span>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>
+            2. Elastische Spannung
+            <button id="btn-tension" class="toggle-btn">Ton An/Aus</button>
+        </h2>
+        <span class="info">Simuliert den Auszug. Achtung: Sound verändert sich mit der Dehnung.</span>
+        
+        <div class="control-group">
+            <label>Auszugslänge (Dehnung) <span id="val-tension" class="value-display">0%</span></label>
+            <input type="range" id="slider-tension" min="0" max="100" value="0">
+        </div>
+    </div>
+
+    <script>
+        // --- SETUP ---
+        let isStarted = false;
+
+        // 1. Globaler Hall (Reverb)
+        // Wir schicken alles hier durch, bevor es zum Lautsprecher geht
+        const reverb = new Tone.Reverb({
+            decay: 2,
+            wet: 0.2 // 20% Hall-Anteil initial
+        }).toDestination();
+
+        // 2. Synth für den Rhythmus (Einparkhilfe)
+        // "PingPongDelay" macht den Sound etwas räumlicher (Stereo)
+        const pingPong = new Tone.PingPongDelay("8n", 0.2).connect(reverb);
+        const loopSynth = new Tone.Synth({
+            oscillator: { type: "sine" },
+            envelope: { attack: 0.01, decay: 0.1, sustain: 0, release: 0.1 } // Sehr kurzes "Beep"
+        }).connect(pingPong);
+
+        // 3. Synth für den Gummi (Tension)
+        // MonoSynth eignet sich gut für Filter-Effekte
+        const tensionSynth = new Tone.MonoSynth({
+            oscillator: { type: "sawtooth" }, // "Sägezahn" klingt rauer/mechanischer als Sinus
+            filter: {
+                Q: 2,             // Resonanz
+                type: "lowpass",  // Dumpf zu Hell
+                rolloff: -24
+            },
+            envelope: { attack: 0.1, decay: 0.3, sustain: 0.9, release: 1 },
+            filterEnvelope: { attack: 0.06, decay: 0.2, sustain: 0.5, release: 2, baseFrequency: 200, octaves: 7, exponent: 2 }
+        }).connect(reverb);
+        tensionSynth.volume.value = -10; // Etwas leiser starten
+
+
+        // --- START ENGINE ---
+        document.getElementById('start-btn').addEventListener('click', async () => {
+            await Tone.start();
+            isStarted = true;
+            document.getElementById('start-overlay').style.display = 'none';
+        });
+
+
+        // --- LOGIK: REVERB ---
+        const sliderReverb = document.getElementById('slider-reverb');
+        sliderReverb.addEventListener('input', (e) => {
+            const val = e.target.value;
+            document.getElementById('val-reverb').innerText = val + "%";
+            reverb.wet.value = val / 100;
+        });
+
+
+        // --- LOGIK: RHYTHMUS LOOP ---
+        let loop;
+        const btnLoop = document.getElementById('btn-loop');
+        const sliderPitch = document.getElementById('slider-pitch');
+        const sliderInterval = document.getElementById('slider-interval');
+        let currentPitch = 440;
+
+        // Der Loop feuert regelmäßig
+        loop = new Tone.Loop((time) => {
+            loopSynth.triggerAttackRelease(currentPitch, "32n", time);
+        }, "4n"); // Start-Wert, wird vom Slider überschrieben
+
+        // Start/Stop
+        btnLoop.addEventListener('click', () => {
+            if (loop.state === 'started') {
+                loop.stop();
+                btnLoop.classList.remove('active');
+                btnLoop.innerText = "Start Loop";
+            } else {
+                loop.start(0);
+                Tone.Transport.start();
+                btnLoop.classList.add('active');
+                btnLoop.innerText = "Stop Loop";
+            }
+        });
+
+        // Pitch Slider
+        sliderPitch.addEventListener('input', (e) => {
+            currentPitch = parseFloat(e.target.value);
+            document.getElementById('val-pitch').innerText = Math.round(currentPitch) + " Hz";
+        });
+
+        // Interval Slider (Geschwindigkeit)
+        sliderInterval.addEventListener('input', (e) => {
+            // Wir konvertieren Millisekunden in Sekunden für Tone.js
+            const ms = parseFloat(e.target.value);
+            document.getElementById('val-interval').innerText = ms + "ms";
+            loop.interval = ms / 1000;
+        });
+
+
+        // --- LOGIK: GUMMI / SPANNUNG ---
+        const btnTension = document.getElementById('btn-tension');
+        const sliderTension = document.getElementById('slider-tension');
+        let tensionActive = false;
+
+        // Button An/Aus
+        btnTension.addEventListener('click', () => {
+            if (!tensionActive) {
+                // Note starten (tiefes C2 als Basis)
+                tensionSynth.triggerAttack("C2"); 
+                tensionActive = true;
+                btnTension.classList.add('active');
+            } else {
+                tensionSynth.triggerRelease();
+                tensionActive = false;
+                btnTension.classList.remove('active');
+            }
+        });
+
+        // Der "Magic Slider" für den Gummi-Effekt
+        sliderTension.addEventListener('input', (e) => {
+            const val = parseFloat(e.target.value); // 0 bis 100
+            document.getElementById('val-tension').innerText = val + "%";
+
+            if(tensionActive) {
+                // 1. Pitch Bend: Wir gehen von C2 langsam hoch
+                // Detune wird in Cents gemessen (100 Cents = 1 Halbton)
+                // Bei 100% ziehen wir den Ton um 1200 Cents (eine Oktave) hoch
+                tensionSynth.detune.rampTo(val * 24, 0.1); 
+
+                // 2. Filter Öffnung (Dumpf -> Hell)
+                // Bei 0 ist der Filter zu (Sound ist dumpf/muffig)
+                // Bei 100 ist er offen (Sound ist scharf/sägend)
+                const freq = 200 + (val * 50); 
+                tensionSynth.filterEnvelope.baseFrequency = freq;
+
+                // 3. Vibrato (Zittern) bei hoher Anstrengung
+                // Wir nutzen einen LFO (Low Frequency Oscillator) für den Vibrato-Effekt
+                // Je höher die Spannung, desto schneller und stärker das Zittern
+                // (Das ist in Tone.js etwas komplexer, hier simulieren wir es simpel über Lautstärke-Wackeln ist schwer ohne LFO node)
+                // Stattdessen machen wir den Sound "rauer" bei hoher Last
+                
+                if (val > 80) {
+                    // Füge leichte Dissonanz hinzu bei extremer Dehnung
+                    tensionSynth.detune.rampTo((val * 24) + (Math.random() * 50), 0.05);
+                }
+            }
+        });
+
+    </script>
+</body>
+</html>

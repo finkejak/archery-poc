@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Archery Audio Lab</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+    <style>
+        body { font-family: -apple-system, sans-serif; background: #111; color: white; padding: 20px; max-width: 600px; margin: 0 auto; }
+        h1 { color: #4ade80; text-align: center; }
+        .card { background: #222; border: 1px solid #333; border-radius: 12px; padding: 20px; margin-bottom: 20px; }
+        .card h2 { margin-top: 0; font-size: 1.2rem; color: #aaa; border-bottom: 1px solid #444; padding-bottom: 10px; }
+        
+        .control-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; font-size: 0.9rem; }
+        input[type=range] { width: 100%; cursor: pointer; }
+        
+        button { background: #4ade80; color: #000; border: none; padding: 10px 20px; border-radius: 6px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 10px; }
+        button.stop { background: #ef4444; color: white; }
+        button:active { transform: scale(0.98); }
+
+        .value-display { float: right; color: #4ade80; font-family: monospace; }
+        
+        #start-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); display: flex; justify-content: center; align-items: center; z-index: 100; }
+        #start-btn { font-size: 1.5rem; padding: 20px 40px; }
+    </style>
+</head>
+<body>
+
+    <div id="start-overlay">
+        <button id="start-btn">Klicken um Audio Engine zu starten</button>
+    </div>
+
+    <h1>🎧 Feedback Labor</h1>
+
+    <div class="card">
+        <h2>1. Die "Einparkhilfe" (Variable Frequenz)</h2>
+        <p style="font-size: 0.8rem; color: #888;">Simuliert die Annäherung an den Idealwinkel.</p>
+        
+        <div class="control-group">
+            <label>Abweichung (Distanz zum Ideal) <span id="val-prox" class="value-display">50%</span></label>
+            <input type="range" id="slider-prox" min="0" max="100" value="50">
+        </div>
+        
+        <button id="btn-parking">Testen (Hold)</button>
+    </div>
+
+    <div class="card">
+        <h2>2. Harmonie (Dissonanz -> Konsonanz)</h2>
+        <p style="font-size: 0.8rem; color: #888;">Zwei Töne, die zueinander finden.</p>
+        
+        <div class="control-group">
+            <label>Harmonie-Grad <span id="val-harm" class="value-display">0%</span></label>
+            <input type="range" id="slider-harm" min="0" max="100" value="0">
+        </div>
+        
+        <button id="btn-harmony">Testen (Hold)</button>
+    </div>
+
+    <div class="card">
+        <h2>3. Fehler / Warnung</h2>
+        <p style="font-size: 0.8rem; color: #888;">Akustisches Feedback für grobe Fehler.</p>
+        <button id="btn-error" style="background: #fbbf24;">Warnung (Soft)</button>
+        <button id="btn-crit" style="background: #ef4444; margin-top: 10px;">Kritischer Fehler (Hard)</button>
+    </div>
+
+    <script>
+        // --- TONE.JS SETUP ---
+        let isStarted = false;
+
+        // 1. Synth für Einparkhilfe (FM Synth klingt technischer/klarer)
+        const parkingSynth = new Tone.Synth({
+            oscillator: { type: "sine" },
+            envelope: { attack: 0.1, decay: 0.2, sustain: 1.0, release: 0.8 }
+        }).toDestination();
+
+        // 2. Synths für Harmonie (Zwei Stimmen)
+        const harmSynthA = new Tone.Synth({ volume: -5, oscillator: { type: "triangle" } }).toDestination();
+        const harmSynthB = new Tone.Synth({ volume: -5, oscillator: { type: "triangle" } }).toDestination();
+
+        // 3. Noise für Fehler
+        const errorSynth = new Tone.NoiseSynth({
+            noise: { type: "pink" },
+            envelope: { attack: 0.01, decay: 0.3, sustain: 0 }
+        }).toDestination();
+
+        // --- INTERAKTION ---
+
+        // Start Engine
+        document.getElementById('start-btn').addEventListener('click', async () => {
+            await Tone.start();
+            isStarted = true;
+            document.getElementById('start-overlay').style.display = 'none';
+        });
+
+        // 1. EINPARKHILFE LOGIK
+        const sliderProx = document.getElementById('slider-prox');
+        const btnParking = document.getElementById('btn-parking');
+        
+        // Loop für das Piepen (wenn man wollte), hier erst mal kontinuierlicher Ton
+        // Wir simulieren: Je näher (Wert -> 0), desto höher der Ton
+        
+        sliderProx.addEventListener('input', (e) => {
+            const val = e.target.value;
+            document.getElementById('val-prox').innerText = val + "%";
+            
+            // Logik: 100% Abweichung = 200Hz, 0% Abweichung = 880Hz (Hoch)
+            // Wir invertieren den Slider: 100-val
+            const closeness = 100 - val; 
+            const freq = 200 + (closeness * 6); // Range 200Hz bis 800Hz
+            
+            if(Tone.context.state === 'running') {
+                parkingSynth.frequency.rampTo(freq, 0.1);
+            }
+        });
+
+        btnParking.addEventListener('mousedown', () => {
+            const val = sliderProx.value;
+            const closeness = 100 - val;
+            const freq = 200 + (closeness * 6);
+            parkingSynth.triggerAttack(freq);
+        });
+        btnParking.addEventListener('mouseup', () => parkingSynth.triggerRelease());
+
+
+        // 2. HARMONIE LOGIK
+        const sliderHarm = document.getElementById('slider-harm');
+        const btnHarm = document.getElementById('btn-harmony');
+
+        sliderHarm.addEventListener('input', (e) => {
+            const val = e.target.value;
+            document.getElementById('val-harm').innerText = val + "%";
+            
+            // Basis-Ton: C4 (ca 261Hz)
+            const baseFreq = 261.63;
+            
+            // Der zweite Ton ist bei 0% ein "Tritonus" (sehr schief, ca. 370Hz)
+            // Bei 100% ist er eine reine Quinte (sehr harmonisch, ca. 392Hz) oder Oktave
+            
+            // Einfacher: Wir detunen (verstimmen) den zweiten Ton.
+            // 0% = 100 Cent verstimmt (schief), 100% = 0 Cent (Unisono/Perfekt)
+            const detune = (100 - val) * 5; // 0 bis 500 Cent Verstimmung
+            
+            if(Tone.context.state === 'running') {
+                harmSynthA.frequency.rampTo(baseFreq, 0.1);
+                harmSynthB.frequency.rampTo(baseFreq + detune, 0.1); // Simple Frequenz-Addition für Schwebung
+            }
+        });
+
+        btnHarm.addEventListener('mousedown', () => {
+            const val = sliderHarm.value;
+            const baseFreq = 261.63;
+            const detune = (100 - val) * 2; // Hz Differenz
+            
+            harmSynthA.triggerAttack(baseFreq);
+            harmSynthB.triggerAttack(baseFreq + detune);
+        });
+        btnHarm.addEventListener('mouseup', () => {
+            harmSynthA.triggerRelease();
+            harmSynthB.triggerRelease();
+        });
+
+
+        // 3. FEHLER LOGIK
+        document.getElementById('btn-error').addEventListener('click', () => {
+            // Ein kurzes "Pffft" (Pink Noise)
+            errorSynth.noise.type = "pink";
+            errorSynth.triggerAttackRelease("16n");
+        });
+
+        document.getElementById('btn-crit').addEventListener('click', () => {
+            // Ein hartes "KRRRZT" (White Noise, lauter)
+            errorSynth.noise.type = "white";
+            errorSynth.triggerAttackRelease("8n");
+        });
+
+    </script>
+</body>
+</html>

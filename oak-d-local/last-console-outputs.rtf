@@ -1,0 +1,209 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2867
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fnil\fcharset0 Menlo-Regular;\f1\fnil\fcharset0 Menlo-Bold;}
+{\colortbl;\red255\green255\blue255;\red0\green0\blue0;\red96\green142\blue24;\red57\green192\blue38;
+\red202\green51\blue35;\red56\green185\blue199;\red86\green32\blue244;}
+{\*\expandedcolortbl;;\csgray\c0;\cssrgb\c44706\c61176\c12157;\cssrgb\c25706\c77963\c19557;
+\cssrgb\c83899\c28663\c18026;\cssrgb\c25546\c77007\c82023;\cssrgb\c41681\c25958\c96648;}
+\paperw11900\paperh16840\margl1440\margr1440\vieww11520\viewh8400\viewkind0
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
+
+\f0\fs22 \cf2 \CocoaLigature0 Last login: Wed Nov 26 18:28:47 on console\
+jakob@Jakobs-MacBook-Air ~ % cd /Users/jakob/Desktop/GitHub/archery_poc/oak-d-local\
+jakob@Jakobs-MacBook-Air oak-d-local % python3 -m venv venv\
+jakob@Jakobs-MacBook-Air oak-d-local % source venv/bin/activate\
+(venv) jakob@Jakobs-MacBook-Air oak-d-local % pip install depthai mediapipe websockets asyncio numpy opencv-python\
+Collecting depthai\
+  Obtaining dependency information for depthai from https://files.pythonhosted.org/packages/c5/44/a7604ef00a59f54d8e37cbc6133fe657973bbf0d7eeeb54a737ce5d8f8f9/depthai-3.2.0-cp39.cp310.cp311.cp312.cp313.cp314-cp39.cp310.cp311.cp312.cp313.cp314-macosx_11_0_arm64.whl.metadata\
+  Downloading depthai-3.2.0-cp39.cp310.cp311.cp312.cp313.cp314-cp39.cp310.cp311.cp312.cp313.cp314-macosx_11_0_arm64.whl.metadata (10.0 kB)\
+Collecting mediapipe\
+  Obtaining dependency information for mediapipe from https://files.pythonhosted.org/packages/f1/df/b1912b0d4e88c70a969258b201737c92ea268a90650c470ee842833a6690/mediapipe-0.10.21-cp312-cp312-macosx_11_0_universal2.whl.metadata\
+  Downloading mediapipe-0.10.21-cp312-cp312-macosx_11_0_universal2.whl.metadata (9.9 kB)\
+Collecting websockets\
+  Obtaining dependency information for websockets from https://files.pythonhosted.org/packages/3d/69/1a681dd6f02180916f116894181eab8b2e25b31e484c5d0eae637ec01f7c/websockets-15.0.1-cp312-cp312-macosx_11_0_arm64.whl.metadata\
+  Downloading websockets-15.0.1-cp312-cp312-macosx_11_0_arm64.whl.metadata (6.8 kB)\
+Collecting asyncio\
+  Obtaining dependency information for asyncio from https://files.pythonhosted.org/packages/57/64/eff2564783bd650ca25e15938d1c5b459cda997574a510f7de69688cb0b4/asyncio-4.0.0-py3-none-any.whl.metadata\
+  Downloading asyncio-4.0.0-py3-none-any.whl.metadata (994 bytes)\
+Collecting numpy\
+  Obtaining dependency information for numpy from https://files.pythonhosted.org/packages/5b/e1/1ee06e70eb2136797abe847d386e7c0e830b67ad1d43f364dd04fa50d338/numpy-2.3.5-cp312-cp312-macosx_14_0_arm64.whl.metadata\
+  Downloading numpy-2.3.5-cp312-cp312-macosx_14_0_arm64.whl.metadata (62 kB)\
+     \cf3 \uc0\u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \cf2  \cf4 62.1/62.1 kB\cf2  \cf5 2.7 MB/s\cf2  eta \cf6 0:00:00\cf2 \
+Collecting opencv-python\
+  Obtaining dependency information for opencv-python from https://files.pythonhosted.org/packages/85/68/3da40142e7c21e9b1d4e7ddd6c58738feb013203e6e4b803d62cdd9eb96b/opencv_python-4.12.0.88-cp37-abi3-macosx_13_0_arm64.whl.metadata\
+  Downloading opencv_python-4.12.0.88-cp37-abi3-macosx_13_0_arm64.whl.metadata (19 kB)\
+Collecting absl-py (from mediapipe)\
+  Obtaining dependency information for absl-py from https://files.pythonhosted.org/packages/8f/aa/ba0014cc4659328dc818a28827be78e6d97312ab0cb98105a770924dc11e/absl_py-2.3.1-py3-none-any.whl.metadata\
+  Downloading absl_py-2.3.1-py3-none-any.whl.metadata (3.3 kB)\
+Collecting attrs>=19.1.0 (from mediapipe)\
+  Obtaining dependency information for attrs>=19.1.0 from https://files.pythonhosted.org/packages/3a/2a/7cc015f5b9f5db42b7d48157e23356022889fc354a2813c15934b7cb5c0e/attrs-25.4.0-py3-none-any.whl.metadata\
+  Downloading attrs-25.4.0-py3-none-any.whl.metadata (10 kB)\
+Collecting flatbuffers>=2.0 (from mediapipe)\
+  Obtaining dependency information for flatbuffers>=2.0 from https://files.pythonhosted.org/packages/ee/1b/00a78aa2e8fbd63f9af08c9c19e6deb3d5d66b4dda677a0f61654680ee89/flatbuffers-25.9.23-py2.py3-none-any.whl.metadata\
+  Downloading flatbuffers-25.9.23-py2.py3-none-any.whl.metadata (875 bytes)\
+Collecting jax (from mediapipe)\
+  Obtaining dependency information for jax from https://files.pythonhosted.org/packages/f9/e7/19b8cfc8963b2e10a01a4db7bb27ec5fa39ecd024bc62f8e2d1de5625a9d/jax-0.8.1-py3-none-any.whl.metadata\
+  Downloading jax-0.8.1-py3-none-any.whl.metadata (13 kB)\
+Collecting jaxlib (from mediapipe)\
+  Obtaining dependency information for jaxlib from https://files.pythonhosted.org/packages/d9/9d/59b36e2f348e599d5812743f263ca54aa03be1a4c9dfc11504d19864b72d/jaxlib-0.8.1-cp312-cp312-macosx_11_0_arm64.whl.metadata\
+  Downloading jaxlib-0.8.1-cp312-cp312-macosx_11_0_arm64.whl.metadata (1.3 kB)\
+Collecting matplotlib (from mediapipe)\
+  Obtaining dependency information for matplotlib from https://files.pythonhosted.org/packages/11/0b/1ae80ddafb8652fd8046cb5c8460ecc8d4afccb89e2c6d6bec61e04e1eaf/matplotlib-3.10.7-cp312-cp312-macosx_11_0_arm64.whl.metadata\
+  Downloading matplotlib-3.10.7-cp312-cp312-macosx_11_0_arm64.whl.metadata (11 kB)\
+Collecting numpy\
+  Obtaining dependency information for numpy from https://files.pythonhosted.org/packages/75/5b/ca6c8bd14007e5ca171c7c03102d17b4f4e0ceb53957e8c44343a9546dcc/numpy-1.26.4-cp312-cp312-macosx_11_0_arm64.whl.metadata\
+  Downloading numpy-1.26.4-cp312-cp312-macosx_11_0_arm64.whl.metadata (61 kB)\
+     \cf3 \uc0\u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \cf2  \cf4 61.1/61.1 kB\cf2  \cf5 5.0 MB/s\cf2  eta \cf6 0:00:00\cf2 \
+Collecting opencv-contrib-python (from mediapipe)\
+  Obtaining dependency information for opencv-contrib-python from https://files.pythonhosted.org/packages/26/c7/7cc80acd8a1ef9438542364b41751ecea2e95cf16b8ac4e48ebca643b203/opencv_contrib_python-4.12.0.88-cp37-abi3-macosx_13_0_arm64.whl.metadata\
+  Downloading opencv_contrib_python-4.12.0.88-cp37-abi3-macosx_13_0_arm64.whl.metadata (19 kB)\
+Collecting protobuf<5,>=4.25.3 (from mediapipe)\
+  Obtaining dependency information for protobuf<5,>=4.25.3 from https://files.pythonhosted.org/packages/28/d7/ab27049a035b258dab43445eb6ec84a26277b16105b277cbe0a7698bdc6c/protobuf-4.25.8-cp37-abi3-macosx_10_9_universal2.whl.metadata\
+  Downloading protobuf-4.25.8-cp37-abi3-macosx_10_9_universal2.whl.metadata (541 bytes)\
+Collecting sounddevice>=0.4.4 (from mediapipe)\
+  Obtaining dependency information for sounddevice>=0.4.4 from https://files.pythonhosted.org/packages/2f/39/714118f8413e0e353436914f2b976665161f1be2b6483ac15a8f61484c14/sounddevice-0.5.3-py3-none-macosx_10_6_x86_64.macosx_10_6_universal2.whl.metadata\
+  Downloading sounddevice-0.5.3-py3-none-macosx_10_6_x86_64.macosx_10_6_universal2.whl.metadata (1.6 kB)\
+Collecting sentencepiece (from mediapipe)\
+  Obtaining dependency information for sentencepiece from https://files.pythonhosted.org/packages/19/84/42eb3ce4796777a1b5d3699dfd4dca85113e68b637f194a6c8d786f16a04/sentencepiece-0.2.1-cp312-cp312-macosx_11_0_arm64.whl.metadata\
+  Downloading sentencepiece-0.2.1-cp312-cp312-macosx_11_0_arm64.whl.metadata (10 kB)\
+INFO: pip is looking at multiple versions of opencv-python to determine which version is compatible with other requirements. This could take a while.\
+Collecting opencv-python\
+  Obtaining dependency information for opencv-python from https://files.pythonhosted.org/packages/05/4d/53b30a2a3ac1f75f65a59eb29cf2ee7207ce64867db47036ad61743d5a23/opencv_python-4.11.0.86-cp37-abi3-macosx_13_0_arm64.whl.metadata\
+  Downloading opencv_python-4.11.0.86-cp37-abi3-macosx_13_0_arm64.whl.metadata (20 kB)\
+Collecting CFFI>=1.0 (from sounddevice>=0.4.4->mediapipe)\
+  Obtaining dependency information for CFFI>=1.0 from https://files.pythonhosted.org/packages/df/a2/781b623f57358e360d62cdd7a8c681f074a71d445418a776eef0aadb4ab4/cffi-2.0.0-cp312-cp312-macosx_11_0_arm64.whl.metadata\
+  Downloading cffi-2.0.0-cp312-cp312-macosx_11_0_arm64.whl.metadata (2.6 kB)\
+Collecting ml_dtypes>=0.5.0 (from jax->mediapipe)\
+  Obtaining dependency information for ml_dtypes>=0.5.0 from https://files.pythonhosted.org/packages/a8/b8/3c70881695e056f8a32f8b941126cf78775d9a4d7feba8abcb52cb7b04f2/ml_dtypes-0.5.4-cp312-cp312-macosx_10_13_universal2.whl.metadata\
+  Downloading ml_dtypes-0.5.4-cp312-cp312-macosx_10_13_universal2.whl.metadata (8.9 kB)\
+INFO: pip is looking at multiple versions of jax to determine which version is compatible with other requirements. This could take a while.\
+Collecting jax (from mediapipe)\
+  Obtaining dependency information for jax from https://files.pythonhosted.org/packages/b3/77/4e6c9a54247810eff8ac8a1af7dc1be0779b52df0d82f3fc8586061914f3/jax-0.8.0-py3-none-any.whl.metadata\
+  Downloading jax-0.8.0-py3-none-any.whl.metadata (13 kB)\
+Collecting jaxlib (from mediapipe)\
+  Obtaining dependency information for jaxlib from https://files.pythonhosted.org/packages/17/3c/939138d7ee36d124d02bf411f8a76dda9606fb4adc3e1452cdc8ce7cb1f7/jaxlib-0.8.0-cp312-cp312-macosx_11_0_arm64.whl.metadata\
+  Downloading jaxlib-0.8.0-cp312-cp312-macosx_11_0_arm64.whl.metadata (1.3 kB)\
+Collecting jax (from mediapipe)\
+  Obtaining dependency information for jax from https://files.pythonhosted.org/packages/d5/e6/5fd0f6fff79eb47469ff9c4fa27125b661517a2fbf8884689b02e9fdfaa8/jax-0.7.2-py3-none-any.whl.metadata\
+  Downloading jax-0.7.2-py3-none-any.whl.metadata (13 kB)\
+Collecting jaxlib (from mediapipe)\
+  Obtaining dependency information for jaxlib from https://files.pythonhosted.org/packages/df/82/324ffb86a6de8c149689b499b6dc6e4f83684fe43ae9e81c8e5eb91bc50f/jaxlib-0.7.2-cp312-cp312-macosx_11_0_arm64.whl.metadata\
+  Downloading jaxlib-0.7.2-cp312-cp312-macosx_11_0_arm64.whl.metadata (1.3 kB)\
+Collecting jax (from mediapipe)\
+  Obtaining dependency information for jax from https://files.pythonhosted.org/packages/83/81/793d78c91b0546b3b1f08e55fdd97437174171cd7d70e46098f1a4d94b7b/jax-0.7.1-py3-none-any.whl.metadata\
+  Downloading jax-0.7.1-py3-none-any.whl.metadata (13 kB)\
+Collecting jaxlib (from mediapipe)\
+  Obtaining dependency information for jaxlib from https://files.pythonhosted.org/packages/ef/1f/10543d7a3f7e76dd4bbdc77134890ac2f41bc8570c565961464f6320009b/jaxlib-0.7.1-cp312-cp312-macosx_11_0_arm64.whl.metadata\
+  Downloading jaxlib-0.7.1-cp312-cp312-macosx_11_0_arm64.whl.metadata (1.3 kB)\
+Collecting opt_einsum (from jax->mediapipe)\
+  Obtaining dependency information for opt_einsum from https://files.pythonhosted.org/packages/23/cd/066e86230ae37ed0be70aae89aabf03ca8d9f39c8aea0dec8029455b5540/opt_einsum-3.4.0-py3-none-any.whl.metadata\
+  Downloading opt_einsum-3.4.0-py3-none-any.whl.metadata (6.3 kB)\
+Collecting scipy>=1.12 (from jax->mediapipe)\
+  Obtaining dependency information for scipy>=1.12 from https://files.pythonhosted.org/packages/96/5e/36bf3f0ac298187d1ceadde9051177d6a4fe4d507e8f59067dc9dd39e650/scipy-1.16.3-cp312-cp312-macosx_14_0_arm64.whl.metadata\
+  Downloading scipy-1.16.3-cp312-cp312-macosx_14_0_arm64.whl.metadata (62 kB)\
+     \cf3 \uc0\u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \cf2  \cf4 62.0/62.0 kB\cf2  \cf5 7.1 MB/s\cf2  eta \cf6 0:00:00\cf2 \
+Collecting contourpy>=1.0.1 (from matplotlib->mediapipe)\
+  Obtaining dependency information for contourpy>=1.0.1 from https://files.pythonhosted.org/packages/53/3e/405b59cfa13021a56bba395a6b3aca8cec012b45bf177b0eaf7a202cde2c/contourpy-1.3.3-cp312-cp312-macosx_11_0_arm64.whl.metadata\
+  Downloading contourpy-1.3.3-cp312-cp312-macosx_11_0_arm64.whl.metadata (5.5 kB)\
+Collecting cycler>=0.10 (from matplotlib->mediapipe)\
+  Obtaining dependency information for cycler>=0.10 from https://files.pythonhosted.org/packages/e7/05/c19819d5e3d95294a6f5947fb9b9629efb316b96de511b418c53d245aae6/cycler-0.12.1-py3-none-any.whl.metadata\
+  Downloading cycler-0.12.1-py3-none-any.whl.metadata (3.8 kB)\
+Collecting fonttools>=4.22.0 (from matplotlib->mediapipe)\
+  Obtaining dependency information for fonttools>=4.22.0 from https://files.pythonhosted.org/packages/e3/f7/a10b101b7a6f8836a5adb47f2791f2075d044a6ca123f35985c42edc82d8/fonttools-4.60.1-cp312-cp312-macosx_10_13_universal2.whl.metadata\
+  Downloading fonttools-4.60.1-cp312-cp312-macosx_10_13_universal2.whl.metadata (112 kB)\
+     \cf3 \uc0\u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \cf2  \cf4 112.3/112.3 kB\cf2  \cf5 9.5 MB/s\cf2  eta \cf6 0:00:00\cf2 \
+Collecting kiwisolver>=1.3.1 (from matplotlib->mediapipe)\
+  Obtaining dependency information for kiwisolver>=1.3.1 from https://files.pythonhosted.org/packages/5b/5a/51f5464373ce2aeb5194508298a508b6f21d3867f499556263c64c621914/kiwisolver-1.4.9-cp312-cp312-macosx_11_0_arm64.whl.metadata\
+  Downloading kiwisolver-1.4.9-cp312-cp312-macosx_11_0_arm64.whl.metadata (6.3 kB)\
+Collecting packaging>=20.0 (from matplotlib->mediapipe)\
+  Obtaining dependency information for packaging>=20.0 from https://files.pythonhosted.org/packages/20/12/38679034af332785aac8774540895e234f4d07f7545804097de4b666afd8/packaging-25.0-py3-none-any.whl.metadata\
+  Downloading packaging-25.0-py3-none-any.whl.metadata (3.3 kB)\
+Collecting pillow>=8 (from matplotlib->mediapipe)\
+  Obtaining dependency information for pillow>=8 from https://files.pythonhosted.org/packages/fd/e0/ed960067543d080691d47d6938ebccbf3976a931c9567ab2fbfab983a5dd/pillow-12.0.0-cp312-cp312-macosx_11_0_arm64.whl.metadata\
+  Downloading pillow-12.0.0-cp312-cp312-macosx_11_0_arm64.whl.metadata (8.8 kB)\
+Collecting pyparsing>=3 (from matplotlib->mediapipe)\
+  Obtaining dependency information for pyparsing>=3 from https://files.pythonhosted.org/packages/10/5e/1aa9a93198c6b64513c9d7752de7422c06402de6600a8767da1524f9570b/pyparsing-3.2.5-py3-none-any.whl.metadata\
+  Downloading pyparsing-3.2.5-py3-none-any.whl.metadata (5.0 kB)\
+Collecting python-dateutil>=2.7 (from matplotlib->mediapipe)\
+  Obtaining dependency information for python-dateutil>=2.7 from https://files.pythonhosted.org/packages/ec/57/56b9bcc3c9c6a792fcbaf139543cee77261f3651ca9da0c93f5c1221264b/python_dateutil-2.9.0.post0-py2.py3-none-any.whl.metadata\
+  Downloading python_dateutil-2.9.0.post0-py2.py3-none-any.whl.metadata (8.4 kB)\
+INFO: pip is looking at multiple versions of opencv-contrib-python to determine which version is compatible with other requirements. This could take a while.\
+Collecting opencv-contrib-python (from mediapipe)\
+  Obtaining dependency information for opencv-contrib-python from https://files.pythonhosted.org/packages/f3/78/b504ca8f7a312918d184e0b8093c62bc9a110d8154f658b591ef5c020d65/opencv_contrib_python-4.11.0.86-cp37-abi3-macosx_13_0_arm64.whl.metadata\
+  Downloading opencv_contrib_python-4.11.0.86-cp37-abi3-macosx_13_0_arm64.whl.metadata (20 kB)\
+Collecting pycparser (from CFFI>=1.0->sounddevice>=0.4.4->mediapipe)\
+  Obtaining dependency information for pycparser from https://files.pythonhosted.org/packages/a0/e3/59cd50310fc9b59512193629e1984c1f95e5c8ae6e5d8c69532ccc65a7fe/pycparser-2.23-py3-none-any.whl.metadata\
+  Downloading pycparser-2.23-py3-none-any.whl.metadata (993 bytes)\
+Collecting six>=1.5 (from python-dateutil>=2.7->matplotlib->mediapipe)\
+  Obtaining dependency information for six>=1.5 from https://files.pythonhosted.org/packages/b7/ce/149a00dd41f10bc29e5921b496af8b574d8413afcd5e30dfa0ed46c2cc5e/six-1.17.0-py2.py3-none-any.whl.metadata\
+  Downloading six-1.17.0-py2.py3-none-any.whl.metadata (1.7 kB)\
+Downloading depthai-3.2.0-cp39.cp310.cp311.cp312.cp313.cp314-cp39.cp310.cp311.cp312.cp313.cp314-macosx_11_0_arm64.whl (58.3 MB)\
+   \cf3 \uc0\u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \cf2  \cf4 58.3/58.3 MB\cf2  \cf5 12.7 MB/s\cf2  eta \cf6 0:00:00\cf2 \
+Downloading mediapipe-0.10.21-cp312-cp312-macosx_11_0_universal2.whl (49.2 MB)\
+   \cf3 \uc0\u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \cf2  \cf4 49.2/49.2 MB\cf2  \cf5 11.2 MB/s\cf2  eta \cf6 0:00:00\cf2 \
+Downloading websockets-15.0.1-cp312-cp312-macosx_11_0_arm64.whl (173 kB)\
+   \cf3 \uc0\u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \cf2  \cf4 173.3/173.3 kB\cf2  \cf5 16.2 MB/s\cf2  eta \cf6 0:00:00\cf2 \
+Downloading asyncio-4.0.0-py3-none-any.whl (5.6 kB)\
+Downloading numpy-1.26.4-cp312-cp312-macosx_11_0_arm64.whl (13.7 MB)\
+   \cf3 \uc0\u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \cf2  \cf4 13.7/13.7 MB\cf2  \cf5 14.8 MB/s\cf2  eta \cf6 0:00:00\cf2 \
+Downloading opencv_python-4.11.0.86-cp37-abi3-macosx_13_0_arm64.whl (37.3 MB)\
+   \cf3 \uc0\u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \cf2  \cf4 37.3/37.3 MB\cf2  \cf5 14.8 MB/s\cf2  eta \cf6 0:00:00\cf2 \
+Downloading attrs-25.4.0-py3-none-any.whl (67 kB)\
+   \cf3 \uc0\u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \cf2  \cf4 67.6/67.6 kB\cf2  \cf5 1.9 MB/s\cf2  eta \cf6 0:00:00\cf2 \
+Downloading flatbuffers-25.9.23-py2.py3-none-any.whl (30 kB)\
+Downloading protobuf-4.25.8-cp37-abi3-macosx_10_9_universal2.whl (394 kB)\
+   \cf3 \uc0\u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \cf2  \cf4 394.5/394.5 kB\cf2  \cf5 10.5 MB/s\cf2  eta \cf6 0:00:00\cf2 \
+Downloading sounddevice-0.5.3-py3-none-macosx_10_6_x86_64.macosx_10_6_universal2.whl (108 kB)\
+   \cf3 \uc0\u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \cf2  \cf4 108.3/108.3 kB\cf2  \cf5 6.1 MB/s\cf2  eta \cf6 0:00:00\cf2 \
+Downloading absl_py-2.3.1-py3-none-any.whl (135 kB)\
+   \cf3 \uc0\u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \cf2  \cf4 135.8/135.8 kB\cf2  \cf5 8.2 MB/s\cf2  eta \cf6 0:00:00\cf2 \
+Downloading jax-0.7.1-py3-none-any.whl (2.8 MB)\
+   \cf3 \uc0\u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \cf2  \cf4 2.8/2.8 MB\cf2  \cf5 15.5 MB/s\cf2  eta \cf6 0:00:00\cf2 \
+Downloading jaxlib-0.7.1-cp312-cp312-macosx_11_0_arm64.whl (57.7 MB)\
+   \cf3 \uc0\u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \cf2  \cf4 57.7/57.7 MB\cf2  \cf5 13.1 MB/s\cf2  eta \cf6 0:00:00\cf2 \
+Downloading matplotlib-3.10.7-cp312-cp312-macosx_11_0_arm64.whl (8.1 MB)\
+   \cf3 \uc0\u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \cf2  \cf4 8.1/8.1 MB\cf2  \cf5 14.9 MB/s\cf2  eta \cf6 0:00:00\cf2 \
+Downloading opencv_contrib_python-4.11.0.86-cp37-abi3-macosx_13_0_arm64.whl (46.3 MB)\
+   \cf3 \uc0\u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \cf2  \cf4 46.3/46.3 MB\cf2  \cf5 11.1 MB/s\cf2  eta \cf6 0:00:00\cf2 \
+Downloading sentencepiece-0.2.1-cp312-cp312-macosx_11_0_arm64.whl (1.3 MB)\
+   \cf3 \uc0\u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \cf2  \cf4 1.3/1.3 MB\cf2  \cf5 12.2 MB/s\cf2  eta \cf6 0:00:00\cf2 \
+Downloading cffi-2.0.0-cp312-cp312-macosx_11_0_arm64.whl (181 kB)\
+   \cf3 \uc0\u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \cf2  \cf4 181.0/181.0 kB\cf2  \cf5 7.0 MB/s\cf2  eta \cf6 0:00:00\cf2 \
+Downloading contourpy-1.3.3-cp312-cp312-macosx_11_0_arm64.whl (273 kB)\
+   \cf3 \uc0\u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \cf2  \cf4 274.0/274.0 kB\cf2  \cf5 6.4 MB/s\cf2  eta \cf6 0:00:00\cf2 \
+Downloading cycler-0.12.1-py3-none-any.whl (8.3 kB)\
+Downloading fonttools-4.60.1-cp312-cp312-macosx_10_13_universal2.whl (2.8 MB)\
+   \cf3 \uc0\u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \cf2  \cf4 2.8/2.8 MB\cf2  \cf5 15.0 MB/s\cf2  eta \cf6 0:00:00\cf2 \
+Downloading kiwisolver-1.4.9-cp312-cp312-macosx_11_0_arm64.whl (64 kB)\
+   \cf3 \uc0\u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \cf2  \cf4 65.0/65.0 kB\cf2  \cf5 3.9 MB/s\cf2  eta \cf6 0:00:00\cf2 \
+Downloading ml_dtypes-0.5.4-cp312-cp312-macosx_10_13_universal2.whl (676 kB)\
+   \cf3 \uc0\u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \cf2  \cf4 676.9/676.9 kB\cf2  \cf5 12.6 MB/s\cf2  eta \cf6 0:00:00\cf2 \
+Downloading packaging-25.0-py3-none-any.whl (66 kB)\
+   \cf3 \uc0\u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \cf2  \cf4 66.5/66.5 kB\cf2  \cf5 3.6 MB/s\cf2  eta \cf6 0:00:00\cf2 \
+Downloading pillow-12.0.0-cp312-cp312-macosx_11_0_arm64.whl (4.7 MB)\
+   \cf3 \uc0\u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \cf2  \cf4 4.7/4.7 MB\cf2  \cf5 15.3 MB/s\cf2  eta \cf6 0:00:00\cf2 \
+Downloading pyparsing-3.2.5-py3-none-any.whl (113 kB)\
+   \cf3 \uc0\u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \cf2  \cf4 113.9/113.9 kB\cf2  \cf5 10.1 MB/s\cf2  eta \cf6 0:00:00\cf2 \
+Downloading python_dateutil-2.9.0.post0-py2.py3-none-any.whl (229 kB)\
+   \cf3 \uc0\u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \cf2  \cf4 229.9/229.9 kB\cf2  \cf5 16.1 MB/s\cf2  eta \cf6 0:00:00\cf2 \
+Downloading scipy-1.16.3-cp312-cp312-macosx_14_0_arm64.whl (20.9 MB)\
+   \cf3 \uc0\u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \cf2  \cf4 20.9/20.9 MB\cf2  \cf5 14.8 MB/s\cf2  eta \cf6 0:00:00\cf2 \
+Downloading opt_einsum-3.4.0-py3-none-any.whl (71 kB)\
+   \cf3 \uc0\u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \cf2  \cf4 71.9/71.9 kB\cf2  \cf5 6.8 MB/s\cf2  eta \cf6 0:00:00\cf2 \
+Downloading six-1.17.0-py2.py3-none-any.whl (11 kB)\
+Downloading pycparser-2.23-py3-none-any.whl (118 kB)\
+   \cf3 \uc0\u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \u9473 \cf2  \cf4 118.1/118.1 kB\cf2  \cf5 9.5 MB/s\cf2  eta \cf6 0:00:00\cf2 \
+Installing collected packages: flatbuffers, websockets, six, sentencepiece, pyparsing, pycparser, protobuf, pillow, packaging, opt_einsum, numpy, kiwisolver, fonttools, cycler, attrs, asyncio, absl-py, scipy, python-dateutil, opencv-python, opencv-contrib-python, ml_dtypes, depthai, contourpy, CFFI, sounddevice, matplotlib, jaxlib, jax, mediapipe\
+Successfully installed CFFI-2.0.0 absl-py-2.3.1 asyncio-4.0.0 attrs-25.4.0 contourpy-1.3.3 cycler-0.12.1 depthai-3.2.0 flatbuffers-25.9.23 fonttools-4.60.1 jax-0.7.1 jaxlib-0.7.1 kiwisolver-1.4.9 matplotlib-3.10.7 mediapipe-0.10.21 ml_dtypes-0.5.4 numpy-1.26.4 opencv-contrib-python-4.11.0.86 opencv-python-4.11.0.86 opt_einsum-3.4.0 packaging-25.0 pillow-12.0.0 protobuf-4.25.8 pycparser-2.23 pyparsing-3.2.5 python-dateutil-2.9.0.post0 scipy-1.16.3 sentencepiece-0.2.1 six-1.17.0 sounddevice-0.5.3 websockets-15.0.1\
+\
+
+\f1\b [
+\f0\b0 \cf7 notice
+\f1\b \cf2 ]
+\f0\b0  A new release of pip is available: \cf5 23.2.1\cf2  -> \cf4 25.3\cf2 \
+
+\f1\b [
+\f0\b0 \cf7 notice
+\f1\b \cf2 ]
+\f0\b0  To update, run: \cf4 pip install --upgrade pip\cf2 \
+(venv) jakob@Jakobs-MacBook-Air oak-d-local % \
+}

@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Archery Audio Mega-Lab</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #121212; color: #e0e0e0; padding: 20px; max-width: 900px; margin: 0 auto; user-select: none; }
+        h1 { color: #06b6d4; text-align: center; font-weight: 300; letter-spacing: 2px; }
+        
+        /* Layout Grid */
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 15px; }
+        
+        /* Module (Karten) */
+        .module { background: #1e1e1e; border: 1px solid #333; border-radius: 8px; padding: 15px; position: relative; }
+        .module h3 { margin: 0 0 15px 0; font-size: 0.9rem; text-transform: uppercase; color: #777; border-bottom: 2px solid #333; padding-bottom: 5px; display: flex; justify-content: space-between; }
+        .module.active { border-color: #06b6d4; }
+        
+        /* Controls */
+        .control { margin-bottom: 12px; }
+        label { display: flex; justify-content: space-between; font-size: 0.8rem; font-weight: bold; margin-bottom: 4px; color: #aaa; }
+        .val { color: #06b6d4; font-family: monospace; }
+        
+        input[type=range] { width: 100%; cursor: pointer; accent-color: #06b6d4; background: #333; height: 4px; border-radius: 2px; }
+        select { width: 100%; background: #333; color: white; border: none; padding: 5px; border-radius: 4px; }
+        
+        /* Master Button */
+        #master-controls { position: sticky; bottom: 20px; background: #06b6d4; padding: 15px; border-radius: 50px; text-align: center; box-shadow: 0 10px 20px rgba(0,0,0,0.5); margin-top: 20px; cursor: pointer; transition: transform 0.1s; color: black; font-weight: 900; letter-spacing: 1px; text-transform: uppercase; z-index: 100; }
+        #master-controls:active { transform: scale(0.98); background: #fff; }
+        
+        #start-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); display: flex; justify-content: center; align-items: center; z-index: 200; }
+        button.start { font-size: 1.5rem; padding: 20px 40px; background: #06b6d4; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; }
+        
+        .signal-flow { font-size: 0.7rem; color: #555; text-align: center; margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+
+    <div id="start-overlay"><button class="start" id="btn-init">Start Audio Engine</button></div>
+
+    <h1>SOUND DESIGN LAB v3</h1>
+    <div class="signal-flow">SIGNALFLUSS: OSZILLATOR ➔ FILTER ➔ DISTORTION ➔ TREMOLO ➔ VIBRATO ➔ REVERB ➔ OUT</div>
+
+    <div class="grid">
+        <div class="module">
+            <h3>1. Oszillator (Quelle)</h3>
+            <div class="control">
+                <label>Wellenform</label>
+                <select id="osc-type">
+                    <option value="sine">Sine (Weich/Rein)</option>
+                    <option value="triangle">Triangle (Flötenartig)</option>
+                    <option value="sawtooth">Sawtooth (Scharf/Technisch)</option>
+                    <option value="square">Square (Gameboy/Retro)</option>
+                </select>
+            </div>
+            <div class="control">
+                <label>Frequenz (Pitch) <span class="val" id="val-freq">440 Hz</span></label>
+                <input type="range" id="param-freq" min="50" max="1000" value="440">
+            </div>
+            <div class="control">
+                <label>Detune (Verstimmung) <span class="val" id="val-detune">0 ct</span></label>
+                <input type="range" id="param-detune" min="-1200" max="1200" value="0">
+            </div>
+        </div>
+
+        <div class="module">
+            <h3>2. Filter (Klangfarbe)</h3>
+            <div class="control">
+                <label>Cutoff Frequenz <span class="val" id="val-cutoff">2000 Hz</span></label>
+                <input type="range" id="param-cutoff" min="50" max="5000" value="2000">
+            </div>
+            <div class="control">
+                <label>Resonanz (Q) <span class="val" id="val-q">1</span></label>
+                <input type="range" id="param-q" min="0" max="20" value="1" step="0.1">
+            </div>
+            <div class="control">
+                <label>Typ</label>
+                <select id="filter-type">
+                    <option value="lowpass">Lowpass (Dumpf)</option>
+                    <option value="highpass">Highpass (Dünn)</option>
+                    <option value="bandpass">Bandpass (Telefon)</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="module">
+            <h3>3. Envelope (Verlauf)</h3>
+            <div class="control">
+                <label>Attack (Einschwingen) <span class="val" id="val-att">0.1s</span></label>
+                <input type="range" id="param-att" min="0" max="2" step="0.01" value="0.1">
+            </div>
+            <div class="control">
+                <label>Release (Ausklang) <span class="val" id="val-rel">1.0s</span></label>
+                <input type="range" id="param-rel" min="0.1" max="5" step="0.1" value="1.0">
+            </div>
+        </div>
+
+        <div class="module">
+            <h3>4. Distortion (Verzerrung)</h3>
+            <div class="control">
+                <label>Menge (Amount) <span class="val" id="val-dist">0</span></label>
+                <input type="range" id="param-dist" min="0" max="1" step="0.01" value="0">
+            </div>
+            <div class="control">
+                <label>Mix (Wet/Dry) <span class="val" id="val-dist-wet">0%</span></label>
+                <input type="range" id="param-dist-wet" min="0" max="1" step="0.01" value="0">
+            </div>
+        </div>
+
+        <div class="module">
+            <h3>5. Tremolo (Lautst.-Wackeln)</h3>
+            <div class="control">
+                <label>Geschwindigkeit <span class="val" id="val-trem-freq">5 Hz</span></label>
+                <input type="range" id="param-trem-freq" min="0" max="20" step="0.1" value="5">
+            </div>
+            <div class="control">
+                <label>Tiefe (Depth) <span class="val" id="val-trem-depth">0</span></label>
+                <input type="range" id="param-trem-depth" min="0" max="1" step="0.01" value="0">
+            </div>
+        </div>
+
+        <div class="module">
+            <h3>6. Vibrato (Tonhöhen-Wackeln)</h3>
+            <div class="control">
+                <label>Geschwindigkeit <span class="val" id="val-vib-freq">5 Hz</span></label>
+                <input type="range" id="param-vib-freq" min="0" max="20" step="0.1" value="5">
+            </div>
+            <div class="control">
+                <label>Tiefe (Depth) <span class="val" id="val-vib-depth">0</span></label>
+                <input type="range" id="param-vib-depth" min="0" max="1" step="0.01" value="0">
+            </div>
+        </div>
+
+        <div class="module">
+            <h3>7. Reverb (Raum/Hall)</h3>
+            <div class="control">
+                <label>Raumgröße (Decay) <span class="val" id="val-rev-dec">1.5s</span></label>
+                <input type="range" id="param-rev-dec" min="0.1" max="10" step="0.1" value="1.5">
+            </div>
+            <div class="control">
+                <label>Mix (Wet/Dry) <span class="val" id="val-rev-wet">0%</span></label>
+                <input type="range" id="param-rev-wet" min="0" max="1" step="0.01" value="0">
+            </div>
+        </div>
+    </div>
+
+    <div id="master-controls">
+        TON HALTEN (GATE)
+    </div>
+
+<script>
+    // --- INITIALISIERUNG ---
+    let synth, dist, tremolo, vibrato, reverb;
+    
+    document.getElementById('btn-init').addEventListener('click', async () => {
+        await Tone.start();
+        initSynth();
+        // Hier stellen wir sicher, dass der Transport beim Start läuft, falls Effekte ihn brauchen (z.B. Tremolo.start())
+        Tone.Transport.start(); 
+        document.getElementById('start-overlay').style.display = 'none';
+    });
+
+    function initSynth() {
+        // 1. Reverb (Am Ende der Kette)
+        reverb = new Tone.Reverb({ decay: 1.5, wet: 0 }).toDestination();
+        
+        // 2. Vibrato
+        vibrato = new Tone.Vibrato({ frequency: 5, depth: 0 }).connect(reverb);
+
+        // 3. Tremolo
+        // Muss gestartet werden, damit der Effekt zuhört
+        tremolo = new Tone.Tremolo({ frequency: 5, depth: 0 }).connect(vibrato).start(); 
+
+        // 4. Distortion
+        dist = new Tone.Distortion({ distortion: 0, wet: 0 }).connect(tremolo);
+
+        // 5. Synth (MonoSynth hat Filter & Envelope eingebaut)
+        synth = new Tone.MonoSynth({
+            oscillator: { type: "sine" },
+            envelope: { attack: 0.1, release: 1.0 },
+            // Initialwerte für den Filter Envelope
+            filterEnvelope: { attack: 0.01, decay: 0, sustain: 1, baseFrequency: 2000, octaves: 0 } 
+        }).connect(dist);
+
+        // Nach der Initialisierung alle Bindings aktivieren
+        setupBindings();
+    }
+
+    // --- GATE BUTTON (AN/AUS) ---
+    const btn = document.getElementById('master-controls');
+    
+    const triggerOn = () => {
+        if(Tone.context.state === 'running' && synth) {
+            const freq = document.getElementById('param-freq').value;
+            synth.triggerAttack(freq);
+            btn.style.background = "#fff";
+        }
+    };
+    const triggerOff = () => {
+        if(Tone.context.state === 'running' && synth) {
+            synth.triggerRelease();
+            btn.style.background = "#06b6d4";
+        }
+    };
+
+    btn.addEventListener('mousedown', triggerOn);
+    btn.addEventListener('mouseup', triggerOff);
+    btn.addEventListener('touchstart', (e) => { e.preventDefault(); triggerOn(); });
+    btn.addEventListener('touchend', (e) => { e.preventDefault(); triggerOff(); });
+    
+    // Tastatur Support (Leertaste)
+    document.addEventListener('keydown', (e) => { if(e.code === 'Space' && !e.repeat) triggerOn(); });
+    document.addEventListener('keyup', (e) => { if(e.code === 'Space') triggerOff(); });
+
+
+    // --- UPDATE FUNKTIONEN ---
+    function bind(id, targetObj, targetParam, suffix = '', multiplier = 1, fixedDecimals = 2) {
+        const el = document.getElementById(id);
+        const valDisplay = document.getElementById(id.replace('param', 'val'));
+        
+        // Initialen Wert setzen
+        let initialVal;
+        if (targetParam.includes('.')) {
+             const parts = targetParam.split('.');
+             initialVal = targetObj[parts[0]][parts[1]].value * multiplier;
+        } else if (targetObj[targetParam] && targetObj[targetParam].value !== undefined) {
+             initialVal = targetObj[targetParam].value * multiplier;
+        } else {
+             initialVal = el.value;
+        }
+        valDisplay.innerText = parseFloat(initialVal).toFixed(fixedDecimals) + suffix;
+
+        el.addEventListener('input', (e) => {
+            const val = parseFloat(e.target.value);
+            valDisplay.innerText = val.toFixed(fixedDecimals) + suffix;
+            
+            // Logik zum Zuweisen
+            // 1. Spezielle Fälle (z.B. Frequenz des Synths)
+            if(id === 'param-freq') {
+                if (synth) synth.frequency.rampTo(val, 0.05);
+                return;
+            }
+
+            // 2. Reguläre Parameter (oft AudioParams mit .value)
+            if (targetObj[targetParam] instanceof Tone.Signal || targetObj[targetParam] instanceof Tone.Param) {
+                 targetObj[targetParam].rampTo(val * multiplier, 0.05);
+            } 
+            // 3. Tief verschachtelte oder Nicht-Audio-Param Properties (z.B. Filter Type)
+            else if (targetParam.includes('.')) {
+                const parts = targetParam.split('.');
+                // Nur wenn das Objekt existiert (für Filter Envelope!)
+                if (targetObj[parts[0]] && targetObj[parts[0]][parts[1]] !== undefined) { 
+                    targetObj[parts[0]][parts[1]] = val * multiplier;
+                }
+            } 
+            // 4. Normale Properties (z.B. Distortion Amount)
+            else {
+                 targetObj[targetParam] = val * multiplier;
+            }
+        });
+    }
+
+    function setupBindings() {
+        // 1. Oszillator
+        document.getElementById('osc-type').addEventListener('change', (e) => synth.oscillator.type = e.target.value);
+        bind('param-freq', {}, 'dummy', ' Hz', 1, 0); // Frequenz wird direkt im Trigger/Input behandelt
+        bind('param-detune', synth, 'detune', ' ct', 1, 0);
+
+        // 2. Filter (Hier war der Fehler: Die Target-Properties sind direkt am synth/filter-Objekt!)
+        bind('param-cutoff', synth.filterEnvelope, 'baseFrequency', ' Hz', 1, 0);
+        bind('param-q', synth.filter, 'Q', '', 1, 1);
+        document.getElementById('filter-type').addEventListener('change', (e) => synth.filter.type = e.target.value);
+
+        // 3. Envelope
+        bind('param-att', synth.envelope, 'attack', 's', 1, 2);
+        bind('param-rel', synth.envelope, 'release', 's', 1, 2);
+
+        // 4. Distortion
+        bind('param-dist', dist, 'distortion');
+        bind('param-dist-wet', dist.wet, 'value', '', 1, 2); 
+
+        // 5. Tremolo
+        bind('param-trem-freq', tremolo.frequency, 'value', ' Hz', 1, 1);
+        bind('param-trem-depth', tremolo.depth, 'value', '', 1, 2);
+
+        // 6. Vibrato
+        bind('param-vib-freq', vibrato.frequency, 'value', ' Hz', 1, 1);
+        bind('param-vib-depth', vibrato.depth, 'value', '', 1, 2);
+
+        // 7. Reverb
+        bind('param-rev-dec', reverb, 'decay', 's', 1, 1);
+        bind('param-rev-wet', reverb.wet, 'value', '', 1, 2); 
+    }
+</script>
+</body>
+</html>

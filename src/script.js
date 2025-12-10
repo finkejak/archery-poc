@@ -58,6 +58,46 @@ function playBeep(frequency, volume) {
 	}
 }
 
+// Variable, um Spamming zu verhindern (nur 1x alle 2 Sekunden auslösen)
+let lastSuccessTime = 0;
+
+function playSuccessSound() {
+    // Cooldown checken: Wenn vor weniger als 2 Sek gespielt, abbrechen
+    const now = Date.now();
+    if (now - lastSuccessTime < 2000) return;
+    lastSuccessTime = now;
+
+    if (audioCtx.state === "suspended") { audioCtx.resume(); }
+
+    const t = audioCtx.currentTime;
+    
+    // Ton 1: Tief (z.B. 400Hz), kurz
+    const osc1 = audioCtx.createOscillator();
+    const gain1 = audioCtx.createGain();
+    osc1.type = "sine";
+    osc1.frequency.value = 440; 
+    osc1.connect(gain1);
+    gain1.connect(audioCtx.destination);
+    
+    osc1.start(t);
+    gain1.gain.setValueAtTime(0.1, t);
+    gain1.gain.exponentialRampToValueAtTime(0.001, t + 0.1);
+    osc1.stop(t + 0.1);
+
+    // Ton 2: Hoch (z.B. 660Hz), kurz, leicht verzögert (+0.1s)
+    const osc2 = audioCtx.createOscillator();
+    const gain2 = audioCtx.createGain();
+    osc2.type = "sine";
+    osc2.frequency.value = 660; // Eine Quinte höher (harmonisch)
+    osc2.connect(gain2);
+    gain2.connect(audioCtx.destination);
+
+    osc2.start(t + 0.1); // Startet wenn der erste aufhört
+    gain2.gain.setValueAtTime(0.1, t + 0.1);
+    gain2.gain.exponentialRampToValueAtTime(0.001, t + 0.3);
+    osc2.stop(t + 0.3);
+}
+
 function stopBeep() {
 	if (isBeeping && oscillator) {
 		try { oscillator.stop(); } catch (e) {
@@ -216,90 +256,93 @@ const camera = new Camera(videoElement, {
 	height: 480,
 });
 
-// LIVE-ANALYSE-FUNKTION (STARK ÜBERARBEITET)
 function onLiveResults(results) {
-	drawScaledImage(results.image);
+    drawScaledImage(results.image);
 
-	if (!results.poseLandmarks || !idealPoseAngles) {
-		stopBeep(); // Stoppe Piepen, wenn keine Pose da ist
-		return;
-	}
+    if (!results.poseLandmarks || !idealPoseAngles) {
+        stopBeep(); // Stoppe Piepen, wenn keine Pose da ist
+        return;
+    }
 
-	// Erzeuge die skalierten Punkte (fürs Zeichnen)
-	const scaledLandmarks = getScaledLandmarks(results.poseLandmarks);
+    // Erzeuge die skalierten Punkte (fürs Zeichnen)
+    const scaledLandmarks = getScaledLandmarks(results.poseLandmarks);
 
-	try {
-		// Hol dir die NORMALISIERTEN Punkte (für die Mathe)
-		const livePose = results.poseLandmarks;
-		const liveShoulder = livePose[11];
-		const liveElbow = livePose[13];
-		const liveWrist = livePose[15];
-		const liveHip = livePose[23];
+    try {
+        // Hol dir die NORMALISIERTEN Punkte (für die Mathe)
+        const livePose = results.poseLandmarks;
+        const liveShoulder = livePose[11];
+        const liveElbow = livePose[13];
+        const liveWrist = livePose[15];
+        const liveHip = livePose[23];
 
-		// Prüfe Sichtbarkeit
-		if (
-			liveShoulder.visibility < 0.5 ||
-			liveElbow.visibility < 0.5 ||
-			liveWrist.visibility < 0.5 ||
-			liveHip.visibility < 0.5
-		) {
-			throw new Error("Bogenarm/Hüfte nicht im Bild");
-		}
+        // Prüfe Sichtbarkeit
+        if (
+            liveShoulder.visibility < 0.5 ||
+            liveElbow.visibility < 0.5 ||
+            liveWrist.visibility < 0.5 ||
+            liveHip.visibility < 0.5
+        ) {
+            throw new Error("Bogenarm/Hüfte nicht im Bild");
+        }
 
-		// --- NEUE LOGIK: ZWEI WINKEL VERGLEICHEN ---
-		const liveBowArmAngle = calculateAngle(
-			liveShoulder,
-			liveElbow,
-			liveWrist
-		);
-		const liveShoulderLiftAngle = calculateAngle(
-			liveElbow,
-			liveShoulder,
-			liveHip
-		);
+        // --- ZWEI WINKEL VERGLEICHEN ---
+        const liveBowArmAngle = calculateAngle(
+            liveShoulder,
+            liveElbow,
+            liveWrist
+        );
+        const liveShoulderLiftAngle = calculateAngle(
+            liveElbow,
+            liveShoulder,
+            liveHip
+        );
 
-		// Berechne Abweichungen
-		const armDiff = Math.abs(liveBowArmAngle - idealPoseAngles.bowArm);
-		const shoulderDiff = Math.abs(
-			liveShoulderLiftAngle - idealPoseAngles.shoulderLift
-		);
+        // Berechne Abweichungen
+        const armDiff = Math.abs(liveBowArmAngle - idealPoseAngles.bowArm);
+        const shoulderDiff = Math.abs(
+            liveShoulderLiftAngle - idealPoseAngles.shoulderLift
+        );
 
-		// Toleranzen
-		const armToleranz = 5.0;
-		const shoulderToleranz = 5.0;
+        // Toleranzen
+        const armToleranz = 5.0;
+        const shoulderToleranz = 5.0;
 
-		// Gesamt-Feedback (Proximity von 0.0 bis 1.0)
-		// Nur wenn BEIDE Winkel gut sind, ist es "perfekt"
-		const armProx = 1.0 - Math.min(1.0, armDiff / 20.0);
-		const shoulderProx = 1.0 - Math.min(1.0, shoulderDiff / 20.0);
-		const totalProximity = (armProx + shoulderProx) / 2.0; // Durchschnittliche Nähe
+        // Gesamt-Feedback (Proximity von 0.0 bis 1.0)
+        const armProx = 1.0 - Math.min(1.0, armDiff / 20.0);
+        const shoulderProx = 1.0 - Math.min(1.0, shoulderDiff / 20.0);
+        const totalProximity = (armProx + shoulderProx) / 2.0;
 
-		let feedbackColor = "#FFFF00"; // Gelb
-		let feedbackLineWidth = 4;
+        let feedbackColor = "#FFFF00"; // Gelb
+        let feedbackLineWidth = 4;
 
-		if (armDiff <= armToleranz && shoulderDiff <= shoulderToleranz) {
-			// WIR SIND PERFEKT
-			feedbackColor = "#00FF00"; // Grün
-			feedbackLineWidth = 8;
-			feedbackText.textContent = "PERFEKT!";
-			playBeep(880, 0.2);
-		} else {
-			// WIR SIND AUF DEM WEG
-			feedbackText.textContent = `Arm: ${armDiff.toFixed(
-				0
-			)}° / Schulter: ${shoulderDiff.toFixed(0)}°`;
-			let freq = 220 + totalProximity * 440;
-			playBeep(freq, 0.1 + totalProximity * 0.1);
-		}
+        // --- FEEDBACK ENTSCHEIDUNG ---
+        if (armDiff <= armToleranz && shoulderDiff <= shoulderToleranz) {
+            // 1. FALL: PERFEKT (Grün + Erfolgs-Sound)
+            feedbackColor = "#00FF00"; 
+            feedbackLineWidth = 8;
+            feedbackText.textContent = "PERFEKT!";
+            
+            stopBeep();         // Den kontinuierlichen Piep-Ton aus
+            playSuccessSound(); // Das einmalige "Häkchen" abspielen
+            
+        } else {
+            // 2. FALL: NOCH NICHT GANZ (Gelb + Einparkhilfe)
+            feedbackText.textContent = `Arm: ${armDiff.toFixed(0)}° / Schulter: ${shoulderDiff.toFixed(0)}°`;
+            
+            let freq = 220 + totalProximity * 440;
+            playBeep(freq, 0.1 + totalProximity * 0.1);
+        }
 
-		// Zeichne das Live-Skelett mit Feedback-Farbe
-		drawSkeleton(scaledLandmarks, feedbackColor, feedbackLineWidth);
-	} catch (error) {
-		stopBeep();
-		feedbackText.textContent = "Suche Pose...";
-	}
+        // Zeichne das Live-Skelett
+        drawSkeleton(scaledLandmarks, feedbackColor, feedbackLineWidth);
+
+    } catch (error) {
+        // 3. FALL: FEHLER (Gelenke nicht sichtbar)
+        stopBeep(); // Ton muss aus sein!
+        feedbackText.textContent = "Suche Pose..."; 
+        // console.log(error); // Optional zum Debuggen
+    }
 }
-
 // --- Globale Zeichen-Funktionen (HELFER) ---
 
 // Zeichnet das Bild skaliert (wie vorher)
