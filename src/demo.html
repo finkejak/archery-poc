@@ -427,33 +427,52 @@ function handleCalibResults(results) {
         poseLive.setOptions({modelComplexity: 1, smoothLandmarks: true});
         poseLive.onResults(onLiveResults);
 
-        async function startLiveSession() {
-            appState.training.isActive = true;
-            appState.training.reps = 0;
-            appState.training.level = 1; // Start with Stand
-            updateLiveUI();
-            
-            speak("Training gestartet. Level Eins: Stand.");
-            initAudio();
+async function startLiveSession() {
+    appState.training.isActive = true;
+    appState.training.reps = 0;
+    appState.training.level = 1; 
+    updateLiveUI();
+    
+    speak("Training gestartet. Level Eins: Stand.");
+    initAudio(); // Audio-Kontext wecken
 
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({ 
-                    video: { facingMode: 'environment', width: {ideal: 1280}, height: {ideal: 720} } 
-                });
-                video.srcObject = stream;
-                
-                const process = async () => {
-                    if(appState.training.isActive && video.videoWidth) {
-                        await poseLive.send({image: video});
-                    }
-                    if(appState.training.isActive) requestAnimationFrame(process);
-                };
-                video.onloadeddata = process;
-            } catch(e) {
-                alert("Kamera Fehler (nutze Simulation 'S' Taste): " + e.message);
-            }
-        }
+    try {
+        // ROBUSTERES KAMERA-SETUP
+        // Wir entfernen width/height constraints, damit das Handy entscheidet
+        const constraints = { 
+            audio: false, 
+            video: { 
+                facingMode: 'environment' // Versucht Rückkamera
+            } 
+        };
 
+        const stream = await navigator.mediaDevices.getUserMedia(constraints);
+        video.srcObject = stream;
+        
+        // WICHTIG FÜR IOS: Explizit play() aufrufen
+        video.onloadedmetadata = () => {
+            video.play();
+            processVideoLoop();
+        };
+
+    } catch(e) {
+        alert("Kamera-Fehler: " + e.message + "\nBitte Seite neu laden oder Safari nutzen.");
+        // Fallback für Demo, falls Kamera gar nicht will:
+        console.error(e);
+    }
+}
+
+// Separate Loop-Funktion für bessere Performance
+async function processVideoLoop() {
+    if(!appState.training.isActive) return;
+    
+    // Nur senden, wenn Video wirklich Daten hat
+    if(video.readyState >= 2) {
+        await poseLive.send({image: video});
+    }
+    
+    requestAnimationFrame(processVideoLoop);
+}
         function updateLiveUI() {
             const cfg = EXERCISES[appState.training.level];
             $('focus-text').innerText = cfg.focus;
