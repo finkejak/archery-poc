@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ArcherSense Prototype</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/pose/pose.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div id="success-overlay"></div>
+    <div id="simulation-indicator">SIMULATION MODE ACTIVE</div>
+
+    <section id="screen-welcome" class="screen active">
+        <div class="content-center">
+            <h1>ARCHER<span class="highlight">SENSE</span></h1>
+            <p>Dein digitaler Coach.</p>
+            <button id="btn-start-onboarding" class="primary-btn">Los geht's</button>
+        </div>
+    </section>
+
+    <section id="screen-calib-side" class="screen">
+        <div class="header">
+            <h2>Kalibrierung 1/2</h2>
+            <p>Seitenprofil</p>
+        </div>
+        <div class="calib-container">
+            <div class="upload-box">
+                <img id="img-preview-side" src="" alt="Vorschau" style="display:none">
+                <p id="calib-text-side">Foto hochladen (Seitlich)</p>
+                <input type="file" id="input-side" accept="image/*">
+            </div>
+            <div id="res-side" class="result-box">Warte auf Bild...</div>
+        </div>
+        <button id="btn-to-front" class="primary-btn" disabled>Weiter</button>
+    </section>
+
+    <section id="screen-calib-front" class="screen">
+        <div class="header">
+            <h2>Kalibrierung 2/2</h2>
+            <p>Frontalansicht</p>
+        </div>
+        <div class="calib-container">
+            <div class="upload-box">
+                <img id="img-preview-front" src="" alt="Vorschau" style="display:none">
+                <p id="calib-text-front">Foto hochladen (Frontal)</p>
+                <input type="file" id="input-front" accept="image/*">
+            </div>
+            <div id="res-front" class="result-box">Warte auf Bild...</div>
+        </div>
+        <button id="btn-finish-calib" class="primary-btn" disabled>Abschließen</button>
+    </section>
+
+    <section id="screen-home" class="screen">
+        <div class="home-header">
+            <h3>Hallo, <span class="highlight">Alex</span></h3>
+            <div class="streak">🔥 3 Tage</div>
+        </div>
+        
+        <div class="card-grid">
+            <div class="card active-card">
+                <h4>Daily Training</h4>
+                <p>Fokus: Stabilität & Stand</p>
+                <button id="btn-start-training" class="action-btn">Starten</button>
+            </div>
+            <div class="card">
+                <h4>Journal</h4>
+                <p>Letzte Session: Gestern</p>
+            </div>
+            <div class="card">
+                <h4>Wissen</h4>
+                <p>Tutorials & Tipps</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="screen-instruction" class="screen">
+        <div class="content-center">
+            <h2 id="instruction-title">Lektion 1</h2>
+            <p id="instruction-text">Stelle dich im Profil zur Kamera. Achte auf deinen Bogenarm.</p>
+            <div class="icon-big">🏹</div>
+            <button id="btn-go-live" class="primary-btn">Kamera starten</button>
+        </div>
+    </section>
+
+    <section id="screen-live" class="screen">
+        <div class="camera-wrapper">
+            <video class="input_video" playsinline muted style="display:none"></video>
+            <canvas class="output_canvas"></canvas>
+            
+            <div class="live-ui-top">
+                <div id="phase-indicator">PHASE 1: SEITE</div>
+                <div id="rep-counter">0 / 5</div>
+            </div>
+            
+            <div class="live-ui-bottom">
+                <div id="live-feedback">Suche Pose...</div>
+                <button id="btn-abort" class="small-btn">X</button>
+            </div>
+        </div>
+    </section>
+
+    <section id="screen-summary" class="screen">
+        <div class="content-center">
+            <h1>Training beendet!</h1>
+            <div class="score-circle">
+                <span>100%</span>
+            </div>
+            <p>Du hast heute an deiner Form gearbeitet.</p>
+            <button id="btn-back-home" class="primary-btn">Zurück zum Home</button>
+        </div>
+    </section>
+
+    <script src="script.js"></script>
+</body>
+</html>
