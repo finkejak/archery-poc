@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8"/>
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-    <title>ArcherSense - Prototype V3</title>
+    <title>ArcherAI - The Intelligent Home Training Extension</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1" rel="stylesheet"/>
@@ -35,11 +35,22 @@
         body { font-family: 'Lexend', sans-serif; overflow: hidden; background-color: #1a2111; color: white; }
         .screen { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; flex-direction: column; overflow-y: auto; }
         .screen.active { display: flex; }
-        /* Overlay & Video styling */
+        
+        /* Video Fix: Video ist sichtbar, Canvas liegt drüber */
         .camera-wrapper { position: relative; flex: 1; background: black; display: flex; justify-content: center; overflow: hidden; }
-        .input_video { position: absolute; top:0; left:0; width: 100%; height: 100%; object-fit: cover; opacity: 0; }
+        .input_video { position: absolute; top:0; left:0; width: 100%; height: 100%; object-fit: cover; z-index: 1; }
         .output_canvas { position: relative; z-index: 10; height: 100%; width: auto; object-fit: cover; }
+        
         #success-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(116,184,20,0.3); z-index: 50; display: none; pointer-events: none; }
+
+        /* Skeleton Illustration CSS */
+        .skeleton-demo { position: relative; width: 100px; height: 150px; border: 2px dashed #444; margin: 0 auto; border-radius: 10px; }
+        .sk-head { width: 20px; height: 20px; border: 2px solid #74b814; border-radius: 50%; position: absolute; top: 10px; left: 38px; }
+        .sk-spine { width: 2px; height: 60px; background: #74b814; position: absolute; top: 32px; left: 48px; }
+        .sk-arm-l { width: 30px; height: 2px; background: #74b814; position: absolute; top: 40px; left: 18px; }
+        .sk-arm-r { width: 30px; height: 2px; background: #74b814; position: absolute; top: 40px; left: 50px; }
+        .sk-leg-l { width: 2px; height: 50px; background: #74b814; position: absolute; top: 90px; left: 38px; transform: rotate(10deg); }
+        .sk-leg-r { width: 2px; height: 50px; background: #74b814; position: absolute; top: 90px; left: 60px; transform: rotate(-10deg); }
     </style>
 </head>
 
@@ -51,46 +62,56 @@
         <div class="mb-6 size-24 rounded-full bg-surface-dark border-2 border-primary flex items-center justify-center">
             <span class="material-symbols-outlined text-primary text-6xl">target</span>
         </div>
-        <h1 class="text-4xl font-bold mb-2">Archer<span class="text-primary">Sense</span></h1>
-        <p class="text-gray-400 mb-8">Dein Coach für zu Hause.</p>
-        <button onclick="goToOnboarding()" class="w-full max-w-sm py-4 bg-primary text-background-dark font-bold rounded-xl hover:brightness-110 transition">
+        <h1 class="text-4xl font-bold mb-2">Archer<span class="text-primary">AI</span></h1>
+        <p class="text-gray-400 mb-8">Coach Helmut Edition</p>
+        <button onclick="startWizard()" class="w-full max-w-sm py-4 bg-primary text-background-dark font-bold rounded-xl hover:brightness-110 transition">
             Starten
         </button>
     </section>
 
-    <section id="screen-calibration" class="screen p-6">
+    <section id="screen-wiz-intro" class="screen p-6 justify-center items-center text-center">
+        <h2 id="wiz-title" class="text-2xl font-bold mb-4">Schritt 1: Frontal</h2>
+        <p id="wiz-desc" class="text-gray-400 mb-6">Stelle dich auf die Schusslinie. Die Kamera sieht dich von vorne/hinten.</p>
+        
+        <div class="skeleton-demo mb-8 bg-surface-dark">
+            <div class="sk-head"></div>
+            <div class="sk-spine"></div>
+            <div class="sk-arm-l"></div><div class="sk-arm-r"></div>
+            <div class="sk-leg-l"></div><div class="sk-leg-r"></div>
+        </div>
+
+        <button onclick="nextWizardStep('upload')" class="w-full max-w-sm py-4 bg-primary text-background-dark font-bold rounded-xl">
+            Verstanden, weiter
+        </button>
+    </section>
+
+    <section id="screen-wiz-upload" class="screen p-6 justify-center">
         <div class="flex items-center mb-6">
-            <button onclick="showScreen('welcome')" class="mr-4 material-symbols-outlined">arrow_back</button>
-            <h2 class="text-xl font-bold">Kalibrierung (Seitenprofil)</h2>
+            <button onclick="prevWizardStep()" class="mr-4 material-symbols-outlined">arrow_back</button>
+            <h2 class="text-xl font-bold">Foto aufnehmen</h2>
         </div>
-
-        <div class="flex flex-col gap-4 max-w-sm mx-auto w-full pb-20">
-            <div class="bg-surface-dark p-4 rounded-xl border border-white/10">
-                <h3 class="font-bold text-primary mb-1">1. Neutraler Stand</h3>
-                <p class="text-xs text-gray-400 mb-2">Arme locker hängend. Wirbelsäule gerade.</p>
-                <input type="file" id="input-stand" accept="image/*" class="block w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:bg-primary/20 file:text-primary"/>
-                <p id="res-stand" class="mt-2 text-xs text-green-400 font-mono"></p>
-            </div>
-
-            <div class="bg-surface-dark p-4 rounded-xl border border-white/10">
-                <h3 class="font-bold text-primary mb-1">2. Setup (T-Pose)</h3>
-                <p class="text-xs text-gray-400 mb-2">Arme gehoben, Blick zum Ziel.</p>
-                <input type="file" id="input-setup" accept="image/*" class="block w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:bg-primary/20 file:text-primary"/>
-                <p id="res-setup" class="mt-2 text-xs text-green-400 font-mono"></p>
-            </div>
-
-            <div class="bg-surface-dark p-4 rounded-xl border border-white/10">
-                <h3 class="font-bold text-primary mb-1">3. Vollauszug (Anker)</h3>
-                <p class="text-xs text-gray-400 mb-2">Hand am Gesicht, Ellenbogen hinten.</p>
-                <input type="file" id="input-draw" accept="image/*" class="block w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:bg-primary/20 file:text-primary"/>
-                <p id="res-draw" class="mt-2 text-xs text-green-400 font-mono"></p>
-            </div>
-
-            <button id="btn-finish-calib" disabled onclick="finishCalibration()" class="w-full py-4 bg-primary disabled:opacity-50 text-background-dark font-bold rounded-xl mt-2">
-                Kalibrierung Speichern
-            </button>
-            <img id="img-processor" style="display:none;" />
+        
+        <div class="bg-surface-dark p-6 rounded-xl border border-white/10 text-center">
+            <span class="material-symbols-outlined text-4xl text-primary mb-2">photo_camera</span>
+            <p class="mb-4 text-sm text-gray-400">Wähle ein Bild oder mache ein Foto.</p>
+            <input type="file" id="wiz-input" accept="image/*" class="block w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:bg-primary/20 file:text-primary"/>
         </div>
+        
+        <img id="wiz-img-proc" style="display:none;" />
+        <div id="wiz-loading" class="hidden mt-4 text-center text-primary animate-pulse">Analysiere Pose...</div>
+    </section>
+
+    <section id="screen-wiz-verify" class="screen p-6 justify-center items-center text-center">
+        <div class="size-16 rounded-full bg-primary/20 flex items-center justify-center mb-4">
+            <span class="material-symbols-outlined text-primary text-3xl">check</span>
+        </div>
+        <h2 class="text-2xl font-bold mb-2">Pose erkannt!</h2>
+        <p id="wiz-result-text" class="text-gray-400 mb-8 font-mono text-sm">Daten wurden gespeichert.</p>
+        
+        <button onclick="confirmWizardStep()" class="w-full max-w-sm py-4 bg-primary text-background-dark font-bold rounded-xl">
+            Bestätigen
+        </button>
+        <button onclick="prevWizardStep()" class="mt-4 text-gray-500 text-sm">Neues Bild wählen</button>
     </section>
 
     <section id="screen-home" class="screen bg-background-dark">
@@ -106,10 +127,17 @@
                 </button>
             </div>
             
-            <div class="grid grid-cols-3 gap-2">
-                 <button onclick="setLevel(1)" class="p-2 bg-surface-dark rounded border border-white/10 text-xs">Level 1: Stand</button>
-                 <button onclick="setLevel(2)" class="p-2 bg-surface-dark rounded border border-white/10 text-xs">Level 2: Setup</button>
-                 <button onclick="setLevel(4)" class="p-2 bg-surface-dark rounded border border-white/10 text-xs">Level 4: Auszug</button>
+            <h3 class="font-bold mb-3 text-sm text-gray-500 uppercase">Schnellstart</h3>
+            <div class="grid grid-cols-2 gap-3">
+                 <button onclick="setLevel(1)" class="p-3 bg-surface-dark rounded-xl border border-white/10 text-sm font-bold text-left hover:border-primary">
+                    1. Stand<br><span class="text-xs text-gray-500 font-normal">Frontal</span>
+                 </button>
+                 <button onclick="setLevel(2)" class="p-3 bg-surface-dark rounded-xl border border-white/10 text-sm font-bold text-left hover:border-primary">
+                    2. Setup<br><span class="text-xs text-gray-500 font-normal">Seitlich</span>
+                 </button>
+                 <button onclick="setLevel(3)" class="p-3 bg-surface-dark rounded-xl border border-white/10 text-sm font-bold text-left hover:border-primary">
+                    3. Auszug<br><span class="text-xs text-gray-500 font-normal">Seitlich</span>
+                 </button>
             </div>
         </div>
     </section>
@@ -128,9 +156,9 @@
             <video class="input_video" playsinline autoplay muted></video>
             <canvas class="output_canvas"></canvas>
             
-            <div class="absolute top-0 left-0 w-full p-4 flex justify-between items-start bg-gradient-to-b from-black/80 to-transparent">
+            <div class="absolute top-0 left-0 w-full p-4 flex justify-between items-start bg-gradient-to-b from-black/80 to-transparent z-20">
                 <div>
-                    <div class="text-xs text-gray-400">WIEDERHOLUNGEN</div>
+                    <div class="text-xs text-gray-400">REPS</div>
                     <div class="text-4xl font-mono font-bold text-white" id="rep-counter">0<span class="text-lg text-gray-500">/5</span></div>
                 </div>
                 
@@ -143,13 +171,14 @@
                         </div>
                     </div>
                     
-                    <button onclick="stopTraining()" class="size-10 rounded-full bg-white/10 flex items-center justify-center text-white mt-2">
+                    <button onclick="stopTraining()" class="size-10 rounded-full bg-white/10 flex items-center justify-center text-white mt-2 hover:bg-red-500">
                         <span class="material-symbols-outlined">close</span>
                     </button>
                 </div>
             </div>
 
-            <div class="absolute bottom-0 left-0 w-full p-6 bg-gradient-to-t from-black/90 to-transparent text-center">
+            <div class="absolute bottom-0 left-0 w-full p-6 bg-gradient-to-t from-black/90 to-transparent text-center z-20">
+                <button onclick="restartCamera()" class="text-xs text-gray-500 underline mb-2">Kamera neu starten</button>
                 <div id="debug-text" class="text-sm text-gray-400 mb-1 font-mono">Suche Pose...</div>
                 <div class="w-full h-2 bg-gray-700 rounded-full overflow-hidden">
                     <div id="prox-bar" class="h-full bg-primary w-0 transition-all duration-100"></div>
@@ -159,42 +188,121 @@
     </section>
 
     <script>
-        // STATE
+        // --- 1. CONFIG & STATE ---
+        const EXERCISES = {
+            1: { name: "Stand", focus: "GERADE HÜFTE", ref: "front" },
+            2: { name: "Setup", focus: "ARM HÖHE", ref: "side" },
+            3: { name: "Auszug", focus: "ANKER", ref: "side" }
+        };
+
         const appState = {
-            screen: 'welcome',
-            calib: { stand: null, setup: null, draw: null },
+            calib: { front: null, side: null },
+            wizard: { step: 'front' }, // 'front' or 'side'
             training: { level: 1, reps: 0, maxReps: 5, holdingSince: 0, isActive: false }
         };
 
-        const EXERCISES = {
-            1: { name: "Stand", focus: "GERADE HÜFTE", ref: "stand" },
-            2: { name: "Setup", focus: "ARM HÖHE", ref: "setup" },
-            3: { name: "Auszug", focus: "ANKER", ref: "draw" },
-            4: { name: "Auszug", focus: "ELLENBOGEN", ref: "draw" }
-        };
-
-        // DOM HELPER
+        // DOM Elements
         const $ = id => document.getElementById(id);
         const screens = document.querySelectorAll('.screen');
         const video = document.querySelector('.input_video');
         const canvas = document.querySelector('.output_canvas');
         const ctx = canvas.getContext('2d');
 
-        // --- NAVIGATION ---
+        // --- 2. NAVIGATION & WIZARD ---
         function showScreen(id) {
             screens.forEach(s => s.classList.remove('active'));
             $(`screen-${id}`).classList.add('active');
         }
 
-        function goToOnboarding() {
-            // TTS Warmup beim ersten User-Klick!
-            initTTS(); 
-            initAudio();
-            showScreen('calibration');
+        function startWizard() {
+            // TTS Warmup
+            if ('speechSynthesis' in window) window.speechSynthesis.speak(new SpeechSynthesisUtterance(""));
+            
+            // Reset & Start with Front
+            appState.wizard.step = 'front';
+            updateWizardUI();
+            showScreen('wiz-intro');
         }
 
+        function updateWizardUI() {
+            const isFront = appState.wizard.step === 'front';
+            $('wiz-title').innerText = isFront ? "Schritt 1: Frontal" : "Schritt 2: Seitlich";
+            $('wiz-desc').innerText = isFront 
+                ? "Kamera auf der Schusslinie. Wir messen Standbreite." 
+                : "Kamera im 90° Winkel (Profil). Wir messen Armwinkel.";
+            // Clear inputs
+            $('wiz-input').value = "";
+        }
+
+        function nextWizardStep(target) {
+            showScreen(`wiz-${target}`);
+        }
+
+        function prevWizardStep() {
+            showScreen('wiz-intro');
+        }
+
+        function confirmWizardStep() {
+            if(appState.wizard.step === 'front') {
+                appState.wizard.step = 'side';
+                updateWizardUI();
+                showScreen('wiz-intro');
+            } else {
+                finishCalibration();
+            }
+        }
+
+        function finishCalibration() {
+            // Save to LocalStorage if needed
+            showScreen('home');
+        }
+
+        // --- 3. CALIBRATION LOGIC ---
+        const poseStatic = new Pose({locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/pose/${file}`});
+        poseStatic.setOptions({modelComplexity: 1});
+        poseStatic.onResults(handleWizResults);
+
+        // Setup File Input Listener
+        $('wiz-input').addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if(file) {
+                $('wiz-loading').classList.remove('hidden');
+                const img = $('wiz-img-proc');
+                img.src = URL.createObjectURL(file);
+                img.onload = () => poseStatic.send({image: img});
+            }
+        });
+
+        function handleWizResults(results) {
+            $('wiz-loading').classList.add('hidden');
+            
+            if(!results.poseLandmarks) {
+                alert("Keine Person erkannt. Bitte versuche es erneut.");
+                return;
+            }
+
+            const lm = results.poseLandmarks;
+            const step = appState.wizard.step;
+
+            if (step === 'front') {
+                // Save Front Data (Shoulder/Foot Ratio)
+                const shoulderW = Math.abs(lm[11].x - lm[12].x);
+                const footW = Math.abs(lm[27].x - lm[28].x);
+                const ratio = shoulderW > 0 ? footW / shoulderW : 0.5;
+                appState.calib.front = { ratio: ratio };
+                $('wiz-result-text').innerText = `Stand-Verhältnis: ${ratio.toFixed(2)}`;
+            } else {
+                // Save Side Data (Arm Angle)
+                const armAngle = calculateAngle(lm[11], lm[13], lm[15]);
+                appState.calib.side = { bowArm: armAngle };
+                $('wiz-result-text').innerText = `Arm-Winkel: ${armAngle.toFixed(0)}°`;
+            }
+
+            showScreen('wiz-verify');
+        }
+
+        // --- 4. TRAINING FLOW ---
         function startTrainingFlow() {
-            initTTS(); // Sicherheitshalber nochmal
             showScreen('safety');
             speak("Bitte Sicherheitshinweise beachten.");
         }
@@ -215,195 +323,139 @@
             showScreen('home');
         }
 
-        // --- CALIBRATION LOGIC (3 IMAGES) ---
-        const poseStatic = new Pose({locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/pose/${file}`});
-        poseStatic.setOptions({modelComplexity: 1});
-        poseStatic.onResults(handleCalibResults);
-
-        let calibTarget = '';
-
-        function setupCalibInput(id, target) {
-            $(id).addEventListener('change', (e) => {
-                calibTarget = target;
-                const file = e.target.files[0];
-                if(file) {
-                    const img = $('img-processor');
-                    img.src = URL.createObjectURL(file);
-                    img.onload = () => poseStatic.send({image: img});
-                }
-            });
-        }
-        setupCalibInput('input-stand', 'stand');
-        setupCalibInput('input-setup', 'setup');
-        setupCalibInput('input-draw', 'draw');
-
-        function handleCalibResults(results) {
-            if(!results.poseLandmarks) return;
-            const lm = results.poseLandmarks;
-            
-            // Vereinfachte Logik: Wir speichern einfach die Landmarks
-            // In einer echten App würde man hier Winkel mitteln
-            if (calibTarget === 'stand') {
-                // Stand: Wir speichern Hüft/Schulter-Verhältnis
-                appState.calib.stand = { lm: lm }; 
-                $(`res-stand`).innerText = "Stand gespeichert ✓";
-            } else if (calibTarget === 'setup') {
-                // Setup: Armwinkel
-                appState.calib.setup = { 
-                    bowArm: calculateAngle(lm[11], lm[13], lm[15]) 
-                };
-                $(`res-setup`).innerText = "Setup gespeichert ✓";
-            } else if (calibTarget === 'draw') {
-                // Draw: Armwinkel im Auszug
-                appState.calib.draw = { 
-                    bowArm: calculateAngle(lm[11], lm[13], lm[15]),
-                    elbow: calculateAngle(lm[13], lm[11], lm[12]) // Schulteröffnung
-                };
-                $(`res-draw`).innerText = "Auszug gespeichert ✓";
-            }
-
-            if(appState.calib.stand && appState.calib.setup && appState.calib.draw) {
-                $('btn-finish-calib').disabled = false;
-            }
-        }
-
-        function finishCalibration() { showScreen('home'); }
-
-        // --- LIVE TRAINING ---
+        // --- 5. LIVE CAMERA & LOGIC ---
         const poseLive = new Pose({locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/pose/${file}`});
         poseLive.setOptions({modelComplexity: 1, smoothLandmarks: true});
         poseLive.onResults(onLiveResults);
 
-async function startLiveSession() {
-    appState.training.isActive = true;
-    updateLiveUI();
-    speak("Kamera wird gestartet.");
+        async function startLiveSession() {
+            appState.training.isActive = true;
+            appState.training.reps = 0;
+            
+            const exercise = EXERCISES[appState.training.level] || EXERCISES[1];
+            $('focus-text').innerText = exercise.focus;
+            speak(`Training gestartet. Fokus: ${exercise.focus}`);
+            
+            initAudio();
+            startCameraStream();
+        }
 
-    try {
-        // RADIKAL VEREINFACHT: Keine width/height constraints
-        const stream = await navigator.mediaDevices.getUserMedia({ 
-            audio: false, // Wichtig: Audio aus, sonst Feedback-Schleife
-            video: { 
-                facingMode: 'environment' // Das ist der einzige Wunsch: Rückkamera
-            } 
-        });
-
-        video.srcObject = stream;
-        
-        // Explizites Play für iOS
-        video.onloadedmetadata = () => {
-            video.play();
-            processLoop(); 
-        };
-
-    } catch(e) {
-        alert("Kamera-Fehler: " + e.message + "\nVersuche Safari (iOS) oder Chrome (Android).");
-    }
-}
-        async function processLoop() {
-            if(appState.training.isActive && video.readyState >= 2) {
-                await poseLive.send({image: video});
+        async function startCameraStream() {
+            try {
+                // ULTRA BASIC CONSTRAINTS FOR BRAVE/MOBILE
+                const stream = await navigator.mediaDevices.getUserMedia({ 
+                    video: { facingMode: 'environment' }, // Keine Width/Height Vorgabe!
+                    audio: false 
+                });
+                video.srcObject = stream;
+                video.onloadedmetadata = () => {
+                    video.play();
+                    processLoop();
+                };
+            } catch(e) {
+                alert("Kamera-Fehler: " + e.message + "\nPrüfe 'Brave Shields' oder Permissions.");
             }
-            if(appState.training.isActive) requestAnimationFrame(processLoop);
+        }
+
+        function restartCamera() {
+            if(video.srcObject) {
+                video.srcObject.getTracks().forEach(t => t.stop());
+            }
+            startCameraStream();
+        }
+
+        async function processLoop() {
+            if(appState.training.isActive) {
+                // Nur senden wenn Video läuft
+                if(video.readyState >= 2) {
+                    await poseLive.send({image: video});
+                }
+                requestAnimationFrame(processLoop);
+            }
         }
 
         function onLiveResults(results) {
-            canvas.width = video.videoWidth; canvas.height = video.videoHeight;
+            // Draw
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
             ctx.clearRect(0,0,canvas.width,canvas.height);
-            ctx.drawImage(results.image,0,0,canvas.width,canvas.height);
             
-            // Dark Overlay
-            ctx.fillStyle = 'rgba(0,0,0,0.5)'; ctx.fillRect(0,0,canvas.width,canvas.height);
-
-if(results.poseLandmarks) {
-    // 1. Die "Outline" (Schwarz, dicker)
-    drawConnectors(ctx, results.poseLandmarks, POSE_CONNECTIONS, {color: '#000000', lineWidth: 6});
-    drawLandmarks(ctx, results.poseLandmarks, {color: '#000000', lineWidth: 6});
-
-    // 2. Die "Füllung" (Neon, dünner)
-    drawConnectors(ctx, results.poseLandmarks, POSE_CONNECTIONS, {color: '#74b814', lineWidth: 3});
-    drawLandmarks(ctx, results.poseLandmarks, {color: '#FFFFFF', lineWidth: 2}); // Punkte weiß
-}
+            // Wenn Video da ist, aber kein Resultat, bleibt Canvas leer (Video sichtbar dahinter)
+            // Wir zeichnen nur Overlay
+            if(results.poseLandmarks) {
+                // High Contrast Style
+                drawConnectors(ctx, results.poseLandmarks, POSE_CONNECTIONS, {color: '#000000', lineWidth: 6});
+                drawLandmarks(ctx, results.poseLandmarks, {color: '#000000', lineWidth: 6});
+                drawConnectors(ctx, results.poseLandmarks, POSE_CONNECTIONS, {color: '#74b814', lineWidth: 3});
+                drawLandmarks(ctx, results.poseLandmarks, {color: '#FFFFFF', lineWidth: 2});
+                
+                // --- KERN LOGIK AUFRUF ---
+                evaluatePose(results.poseLandmarks);
+            }
         }
 
         function evaluatePose(lm) {
-            const exercise = EXERCISES[appState.training.level] || EXERCISES[1];
-            const ref = appState.calib[exercise.ref];
+            const exercise = EXERCISES[appState.training.level];
             let isGood = false;
             let diff = 0;
 
-            // Simple Logic Examples
-            if (exercise.ref === 'setup' && ref) {
+            if (exercise.ref === 'front' && appState.calib.front) {
+                // Compare Front Ratio
+                const shoulderW = Math.abs(lm[11].x - lm[12].x);
+                const footW = Math.abs(lm[27].x - lm[28].x);
+                const currentRatio = shoulderW > 0 ? footW / shoulderW : 0;
+                diff = Math.abs(currentRatio - appState.calib.front.ratio);
+                isGood = diff < 0.2; // Toleranz
+            } 
+            else if (exercise.ref === 'side' && appState.calib.side) {
+                // Compare Side Arm
                 const currentArm = calculateAngle(lm[11], lm[13], lm[15]);
-                diff = Math.abs(currentArm - ref.bowArm);
-                isGood = diff < 15;
-            } else if (exercise.ref === 'draw' && ref) {
-                const currentArm = calculateAngle(lm[11], lm[13], lm[15]);
-                diff = Math.abs(currentArm - ref.bowArm);
-                isGood = diff < 15;
-            } else {
-                // Fallback / Stand (Simulation)
+                diff = Math.abs(currentArm - appState.calib.side.bowArm);
+                isGood = diff < 15; // 15 Grad Toleranz
+            } 
+            else {
+                // Fallback / Simulation
                 isGood = true; 
             }
 
-            // Feedback Visuals
-            const proximity = Math.max(0, 1 - (diff/45));
+            // UI Feedback
+            const proximity = Math.max(0, 1 - (diff / (exercise.ref==='front'? 0.5 : 45)));
             $('prox-bar').style.width = `${proximity * 100}%`;
             $('prox-bar').className = `h-full transition-all ${isGood ? 'bg-primary' : 'bg-error'}`;
-            $('debug-text').innerText = `Diff: ${diff.toFixed(0)}°`;
+            $('debug-text').innerText = isGood ? "Gute Haltung" : "Korigieren...";
 
-            // Feedback Audio
-            handleFeedback(isGood, proximity);
+            handleAudioFeedback(isGood, proximity);
         }
 
-        function handleFeedback(isGood, proximity) {
+        function handleAudioFeedback(isGood, proximity) {
             if (isGood) {
                 updateDrone(true, 1.0);
                 if (appState.training.holdingSince === 0) appState.training.holdingSince = Date.now();
                 
                 if (Date.now() - appState.training.holdingSince > 300) {
-                    // Success!
-                    $('success-overlay').style.display = 'block';
-                    setTimeout(() => $('success-overlay').style.display = 'none', 200);
-                    appState.training.holdingSince = 0;
-                    
-                    // Throttle Success Sound
+                    // SUCCESS
                     if(Date.now() - (window.lastSuccess||0) > 2000) {
                         playSuccess();
                         window.lastSuccess = Date.now();
                         appState.training.reps++;
                         $('rep-counter').innerHTML = `${appState.training.reps}<span class="text-lg text-gray-500">/5</span>`;
                         speak(String(appState.training.reps));
+                        
+                        // Show Overlay briefly
+                        $('success-overlay').style.display = 'block';
+                        setTimeout(() => $('success-overlay').style.display = 'none', 200);
                     }
                 }
             } else {
                 appState.training.holdingSince = 0;
                 updateDrone(true, 0.3);
-                // Geigerzähler Logic hier...
+                // Geigerzähler Logic optional here
             }
         }
 
-        // --- AUDIO & TTS ---
+        // --- AUDIO HELPERS ---
         let drone, polySynth;
-
-        function initTTS() {
-            // Trick: Leere Äußerung, um Engine zu wecken
-            if ('speechSynthesis' in window) {
-                const u = new SpeechSynthesisUtterance("");
-                window.speechSynthesis.speak(u);
-            }
-        }
-
-        function speak(text) {
-            if ('speechSynthesis' in window) {
-                window.speechSynthesis.cancel();
-                const u = new SpeechSynthesisUtterance(text);
-                u.lang = 'de-DE'; 
-                u.rate = 1.1;
-                window.speechSynthesis.speak(u);
-            }
-        }
-
+        
         function initAudio() {
             if(drone || Tone.context.state === 'running') return;
             Tone.start();
@@ -422,18 +474,26 @@ if(results.poseLandmarks) {
             if(polySynth) polySynth.triggerAttackRelease(["C5", "E5", "G5"], "8n");
         }
 
-        // --- MATH ---
+        function speak(text) {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const u = new SpeechSynthesisUtterance(text);
+                u.lang = 'de-DE'; u.rate = 1.1;
+                window.speechSynthesis.speak(u);
+            }
+        }
+
         function calculateAngle(a, b, c) {
             let rad = Math.atan2(c.y - b.y, c.x - b.x) - Math.atan2(a.y - b.y, a.x - b.x);
             let angle = Math.abs(rad * (180.0 / Math.PI));
             if (angle > 180.0) angle = 360 - angle;
             return angle;
         }
-        
+
         // --- SIMULATION (Key S) ---
         document.addEventListener('keydown', e => {
             if(e.key.toLowerCase() === 's' && appState.training.isActive) {
-                 handleFeedback(true, 1.0);
+                 handleAudioFeedback(true, 1.0);
             }
         });
     </script>
