@@ -274,29 +274,32 @@
         poseLive.setOptions({modelComplexity: 1, smoothLandmarks: true});
         poseLive.onResults(onLiveResults);
 
-        async function startLiveSession() {
-            appState.training.isActive = true;
-            appState.training.reps = 0;
-            updateLiveUI();
-            
-            // Fokus-Text setzen
-            const exercise = EXERCISES[appState.training.level] || EXERCISES[1];
-            $('focus-text').innerText = exercise.focus;
-            
-            speak(`Training gestartet. Fokus: ${exercise.focus}`);
+async function startLiveSession() {
+    appState.training.isActive = true;
+    updateLiveUI();
+    speak("Kamera wird gestartet.");
 
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({ 
-                    video: { facingMode: 'environment', width: {ideal: 1280} }, 
-                    audio: false 
-                });
-                video.srcObject = stream;
-                video.onloadedmetadata = () => { video.play(); processLoop(); };
-            } catch(e) {
-                alert("Kamera Fehler: " + e.message);
-            }
-        }
+    try {
+        // RADIKAL VEREINFACHT: Keine width/height constraints
+        const stream = await navigator.mediaDevices.getUserMedia({ 
+            audio: false, // Wichtig: Audio aus, sonst Feedback-Schleife
+            video: { 
+                facingMode: 'environment' // Das ist der einzige Wunsch: Rückkamera
+            } 
+        });
 
+        video.srcObject = stream;
+        
+        // Explizites Play für iOS
+        video.onloadedmetadata = () => {
+            video.play();
+            processLoop(); 
+        };
+
+    } catch(e) {
+        alert("Kamera-Fehler: " + e.message + "\nVersuche Safari (iOS) oder Chrome (Android).");
+    }
+}
         async function processLoop() {
             if(appState.training.isActive && video.readyState >= 2) {
                 await poseLive.send({image: video});
@@ -312,13 +315,15 @@
             // Dark Overlay
             ctx.fillStyle = 'rgba(0,0,0,0.5)'; ctx.fillRect(0,0,canvas.width,canvas.height);
 
-            if(results.poseLandmarks) {
-                drawConnectors(ctx, results.poseLandmarks, POSE_CONNECTIONS, {color: '#ffffff', lineWidth: 2});
-                drawLandmarks(ctx, results.poseLandmarks, {color: '#74b814', lineWidth: 2});
-                
-                // --- LOGIK CHECK ---
-                evaluatePose(results.poseLandmarks);
-            }
+if(results.poseLandmarks) {
+    // 1. Die "Outline" (Schwarz, dicker)
+    drawConnectors(ctx, results.poseLandmarks, POSE_CONNECTIONS, {color: '#000000', lineWidth: 6});
+    drawLandmarks(ctx, results.poseLandmarks, {color: '#000000', lineWidth: 6});
+
+    // 2. Die "Füllung" (Neon, dünner)
+    drawConnectors(ctx, results.poseLandmarks, POSE_CONNECTIONS, {color: '#74b814', lineWidth: 3});
+    drawLandmarks(ctx, results.poseLandmarks, {color: '#FFFFFF', lineWidth: 2}); // Punkte weiß
+}
         }
 
         function evaluatePose(lm) {
