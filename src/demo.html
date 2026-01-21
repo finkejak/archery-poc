@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8"/>
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-    <title>ArcherAI - Final Prototype</title>
+    <title>ArcherAI - Geiger Edition</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1" rel="stylesheet"/>
@@ -37,7 +37,7 @@
         
         #success-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(116,184,20,0.4); z-index: 50; display: none; pointer-events: none; }
         
-        /* Skeleton Animation für Wizard */
+        /* Skeleton Animation */
         .skeleton-demo { position: relative; width: 100px; height: 160px; border: 2px dashed #444; margin: 0 auto; border-radius: 10px; opacity: 0.8; }
         .sk-head { width: 24px; height: 24px; border: 2px solid #74b814; border-radius: 50%; position: absolute; top: 15px; left: 36px; }
         .sk-body { width: 2px; height: 60px; background: #74b814; position: absolute; top: 39px; left: 47px; }
@@ -64,17 +64,10 @@
     <section id="screen-wiz-intro" class="screen p-6 justify-center items-center text-center">
         <h2 id="wiz-title" class="text-2xl font-bold mb-4 text-primary">Schritt 1</h2>
         <p id="wiz-desc" class="text-lg text-gray-300 mb-8 leading-relaxed">...</p>
-        
         <div class="skeleton-demo mb-8 bg-surface-dark/50">
-            <div class="sk-head"></div>
-            <div class="sk-body"></div>
-            <div class="sk-arm"></div>
-            <div class="sk-legs"></div>
+            <div class="sk-head"></div><div class="sk-body"></div><div class="sk-arm"></div><div class="sk-legs"></div>
         </div>
-
-        <button onclick="nextWizardStep('upload')" class="w-full max-w-sm py-4 bg-primary text-background-dark font-bold rounded-xl">
-            Alles klar
-        </button>
+        <button onclick="nextWizardStep('upload')" class="w-full max-w-sm py-4 bg-primary text-background-dark font-bold rounded-xl">Alles klar</button>
     </section>
 
     <section id="screen-wiz-upload" class="screen p-6 justify-center">
@@ -82,13 +75,11 @@
             <button onclick="prevWizardStep()" class="mr-4 material-symbols-outlined">arrow_back</button>
             <h2 class="text-xl font-bold">Aufnahme</h2>
         </div>
-        
         <div class="bg-surface-dark p-8 rounded-xl border border-white/10 text-center flex flex-col gap-4">
             <span class="material-symbols-outlined text-5xl text-primary">add_a_photo</span>
             <p class="text-gray-400">Lade ein Bild hoch oder nutze die Kamera.</p>
             <input type="file" id="wiz-input" accept="image/*" class="block w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:bg-primary/20 file:text-primary"/>
         </div>
-        
         <img id="wiz-img-proc" style="display:none;" />
         <div id="wiz-loading" class="hidden mt-8 text-center text-primary font-bold animate-pulse">Analysiere Körperhaltung...</div>
     </section>
@@ -99,11 +90,7 @@
         </div>
         <h2 class="text-2xl font-bold mb-2">Erfolgreich!</h2>
         <p id="wiz-result-text" class="text-gray-400 mb-8 font-mono text-sm bg-surface-dark p-2 rounded">...</p>
-        
-        <button onclick="confirmWizardStep()" class="w-full max-w-sm py-4 bg-primary text-background-dark font-bold rounded-xl">
-            Weiter
-        </button>
-        <button onclick="prevWizardStep()" class="mt-6 text-gray-500 text-sm underline">Bild wiederholen</button>
+        <button onclick="confirmWizardStep()" class="w-full max-w-sm py-4 bg-primary text-background-dark font-bold rounded-xl">Weiter</button>
     </section>
 
     <section id="screen-home" class="screen bg-background-dark">
@@ -114,32 +101,21 @@
                     <p class="text-xs text-gray-400">Bereit für die nächste Session?</p>
                 </div>
             </div>
-
             <div class="bg-surface-dark rounded-2xl p-6 border border-primary/20 relative overflow-hidden mb-8 shadow-lg">
-                <div class="absolute top-0 right-0 p-4 opacity-5">
-                    <span class="material-symbols-outlined text-9xl">fitness_center</span>
-                </div>
                 <h3 class="text-lg font-bold mb-1 text-primary">Level 1: Stand & Balance</h3>
-                <p class="text-sm text-gray-400 mb-6">Fokus: Stabiler Stand (Dissonanz-Feedback)</p>
+                <p class="text-sm text-gray-400 mb-6">Fokus: Stabiler Stand</p>
                 <button onclick="startTrainingFlow()" class="relative z-10 w-full py-4 bg-primary text-background-dark font-bold rounded-xl flex items-center justify-center gap-2 hover:brightness-110">
                     <span class="material-symbols-outlined">play_arrow</span> Training Starten
                 </button>
             </div>
-            
             <h3 class="font-bold mb-3 text-sm text-gray-500 uppercase tracking-wider">Level Auswahl</h3>
             <div class="flex flex-col gap-3">
                  <button onclick="setLevel(1)" class="p-4 bg-surface-dark rounded-xl border border-white/5 flex justify-between items-center hover:border-primary transition">
-                    <div class="text-left">
-                        <span class="block font-bold">1. Stand & Balance</span>
-                        <span class="text-xs text-gray-500">Audio: Dissonanz (Tief)</span>
-                    </div>
+                    <div class="text-left"><span class="block font-bold">1. Stand & Balance</span><span class="text-xs text-gray-500">Audio: Pochen (Tief)</span></div>
                     <span class="material-symbols-outlined text-gray-600">chevron_right</span>
                  </button>
                  <button onclick="setLevel(2)" class="p-4 bg-surface-dark rounded-xl border border-white/5 flex justify-between items-center hover:border-primary transition">
-                    <div class="text-left">
-                        <span class="block font-bold">2. Setup (Arm)</span>
-                        <span class="text-xs text-gray-500">Audio: Höhe (Mittel)</span>
-                    </div>
+                    <div class="text-left"><span class="block font-bold">2. Setup (Arm)</span><span class="text-xs text-gray-500">Audio: Pochen (Höher)</span></div>
                     <span class="material-symbols-outlined text-gray-600">chevron_right</span>
                  </button>
             </div>
@@ -150,14 +126,9 @@
         <span class="material-symbols-outlined text-error text-6xl mb-4">gpp_maybe</span>
         <h2 class="text-2xl font-bold text-white mb-2">Sicherheitshinweis</h2>
         <div class="bg-surface-dark p-6 rounded-xl border border-error/30 mb-8 max-w-sm text-left shadow-xl">
-            <p class="text-gray-300 leading-relaxed">
-                ⚠️ <strong>Niemals ohne Pfeil lösen (Dry Fire).</strong><br><br>
-                Nutze bitte ein <strong>Theraband</strong> oder übe nur den Auszug ohne Lösen.
-            </p>
+            <p class="text-gray-300 leading-relaxed">⚠️ <strong>Niemals ohne Pfeil lösen.</strong><br><br>Nutze ein <strong>Theraband</strong> oder übe nur den Auszug.</p>
         </div>
-        <button onclick="confirmSafety()" class="w-full max-w-sm py-4 bg-white text-black font-bold rounded-xl hover:bg-gray-200">
-            Verstanden
-        </button>
+        <button onclick="confirmSafety()" class="w-full max-w-sm py-4 bg-white text-black font-bold rounded-xl hover:bg-gray-200">Verstanden</button>
     </section>
 
     <section id="screen-live" class="screen bg-black">
@@ -170,23 +141,17 @@
                     <div class="text-[10px] tracking-widest text-gray-400 uppercase">Wiederholungen</div>
                     <div class="text-5xl font-mono font-bold text-white tracking-tighter" id="rep-counter">0<span class="text-2xl text-gray-600 font-normal">/5</span></div>
                 </div>
-                
                 <div class="flex flex-col items-end gap-3">
                     <div class="px-3 py-1 bg-surface-dark/80 border border-primary/50 text-primary text-xs font-bold rounded-full flex items-center gap-2 backdrop-blur">
-                        <span class="material-symbols-outlined text-sm">visibility</span>
-                        <span id="focus-text">STAND</span>
+                        <span class="material-symbols-outlined text-sm">visibility</span><span id="focus-text">STAND</span>
                     </div>
-                    
-                    <button onclick="stopTraining()" class="size-10 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-red-500/80 transition">
-                        <span class="material-symbols-outlined">close</span>
-                    </button>
+                    <button onclick="stopTraining()" class="size-10 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-red-500/80 transition"><span class="material-symbols-outlined">close</span></button>
                 </div>
             </div>
 
             <div class="absolute bottom-0 left-0 w-full p-6 pb-8 bg-gradient-to-t from-black/90 to-transparent text-center z-20">
                 <button onclick="startCameraStream()" class="text-[10px] text-gray-600 uppercase mb-2">Kamera Neustart</button>
                 <div id="debug-text" class="text-sm text-gray-300 mb-2 font-mono">Suche Körper...</div>
-                
                 <div class="w-full h-3 bg-gray-800 rounded-full overflow-hidden border border-white/10">
                     <div id="prox-bar" class="h-full bg-primary w-0 transition-all duration-200 ease-out shadow-[0_0_10px_#74b814]"></div>
                 </div>
@@ -197,14 +162,10 @@
     <section id="screen-summary" class="screen p-6 justify-center items-center text-center">
         <div class="size-32 rounded-full border-4 border-primary flex items-center justify-center mb-6 relative shadow-[0_0_20px_rgba(116,184,20,0.3)]">
             <span class="text-4xl font-bold text-white">100%</span>
-            <div class="absolute -bottom-3 bg-surface-dark px-3 py-1 rounded border border-primary text-primary font-bold text-xs uppercase">Abgeschlossen</div>
         </div>
         <h2 class="text-3xl font-bold mb-2">Starkes Training!</h2>
         <p class="text-gray-400 mb-10 max-w-xs">Du hast 5 saubere Wiederholungen absolviert.</p>
-        
-        <button onclick="showScreen('home')" class="w-full max-w-sm py-4 bg-surface-dark text-white font-bold rounded-xl border border-white/10 hover:bg-surface-dark/80">
-            Zurück zum Dashboard
-        </button>
+        <button onclick="showScreen('home')" class="w-full max-w-sm py-4 bg-surface-dark text-white font-bold rounded-xl border border-white/10">Zurück zum Dashboard</button>
     </section>
 
     <script>
@@ -235,7 +196,7 @@
         }
 
         function startWizard() {
-            initTTS(); // Warmup Voice
+            initTTS(); 
             appState.wizard.step = 'front';
             updateWizardUI();
             showScreen('wiz-intro');
@@ -244,10 +205,10 @@
         function updateWizardUI() {
             const isFront = appState.wizard.step === 'front';
             $('wiz-title').innerText = isFront ? "Schritt 1: Frontal" : "Schritt 2: Seitlich";
-            // WEICHERE TEXTE
+            // Freundlichere Texte
             $('wiz-desc').innerText = isFront 
-                ? "Positioniere die Kamera auf der Schusslinie. Wir schauen uns deinen Stand von vorne an." 
-                : "Positioniere die Kamera im 90° Winkel zu dir. Wir schauen uns dein Profil an.";
+                ? "Stelle dich auf die Schusslinie. Die Kamera schaut von vorne auf dich." 
+                : "Dreh dich um 90 Grad. Die Kamera schaut jetzt auf dein Profil.";
             $('wiz-input').value = "";
         }
 
@@ -264,7 +225,7 @@
             }
         }
 
-        // --- CALIBRATION (MediaPipe Static) ---
+        // --- CALIBRATION ---
         const poseStatic = new Pose({locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/pose/${file}`});
         poseStatic.setOptions({modelComplexity: 1});
         poseStatic.onResults(handleWizResults);
@@ -288,15 +249,15 @@
                 const sW = Math.abs(lm[11].x - lm[12].x);
                 const fW = Math.abs(lm[27].x - lm[28].x);
                 appState.calib.front = { ratio: sW > 0 ? fW/sW : 0.5 };
-                $('wiz-result-text').innerText = "Standbreite analysiert.";
+                $('wiz-result-text').innerText = "Standbreite gespeichert.";
             } else {
                 appState.calib.side = { bowArm: calculateAngle(lm[11], lm[13], lm[15]) };
-                $('wiz-result-text').innerText = "Armwinkel analysiert.";
+                $('wiz-result-text').innerText = "Armwinkel gespeichert.";
             }
             showScreen('wiz-verify');
         }
 
-        // --- TRAINING FLOW ---
+        // --- TRAINING ---
         function startTrainingFlow() {
             showScreen('safety');
             speak("Bitte Sicherheitshinweis beachten.");
@@ -314,15 +275,15 @@
 
         function stopTraining() {
             appState.training.isActive = false;
-            stopAudio();
+            stopGeiger();
             showScreen('home');
         }
         
         function finishLevel() {
             appState.training.isActive = false;
-            stopAudio();
-            playSuccess(); // Finaler Sound
-            speak("Einheit abgeschlossen. Gute Arbeit.");
+            stopGeiger();
+            playSuccess(); 
+            speak("Training beendet. Sehr gut.");
             showScreen('summary');
         }
 
@@ -338,7 +299,7 @@
             
             const ex = EXERCISES[appState.training.level];
             $('focus-text').innerText = ex.focus;
-            speak(`Training gestartet. Fokus auf ${ex.focus}`);
+            speak(`Training gestartet. Achte auf ${ex.focus}`);
             
             initAudio();
             startCameraStream();
@@ -357,7 +318,7 @@
                 video.srcObject = stream;
                 video.onloadedmetadata = () => { video.play(); processLoop(); };
             } catch(e) {
-                alert("Kamera-Fehler. Prüfe Berechtigungen.");
+                alert("Kamera-Fehler.");
             }
         }
 
@@ -373,7 +334,6 @@
             ctx.clearRect(0,0,canvas.width,canvas.height);
             
             if(results.poseLandmarks) {
-                // High Contrast Outline
                 drawConnectors(ctx, results.poseLandmarks, POSE_CONNECTIONS, {color: '#000000', lineWidth: 6});
                 drawLandmarks(ctx, results.poseLandmarks, {color: '#000000', lineWidth: 6});
                 drawConnectors(ctx, results.poseLandmarks, POSE_CONNECTIONS, {color: '#74b814', lineWidth: 3});
@@ -388,7 +348,6 @@
             let diff = 0;
             let tolerance = 0.2;
 
-            // Logic Switch
             if (ex.ref === 'front' && appState.calib.front) {
                 const sW = Math.abs(lm[11].x - lm[12].x);
                 const fW = Math.abs(lm[27].x - lm[28].x);
@@ -401,43 +360,40 @@
                 diff = Math.abs(cur - appState.calib.side.bowArm);
                 tolerance = 15;
             } 
-            else { diff = 0; } // Simulation
 
             const isGood = diff < tolerance;
-            // Map diff to 0..1 (Proximity)
-            const range = ex.ref === 'front' ? 0.5 : 45;
-            const proximity = Math.max(0, 1 - (diff / range));
+            const proximity = Math.max(0, 1 - (diff / (ex.ref==='front'? 0.5 : 45)));
 
-            // Feedback UI
             $('prox-bar').style.width = `${proximity * 100}%`;
             $('prox-bar').className = `h-full transition-all ${isGood ? 'bg-primary' : 'bg-error shadow-[0_0_10px_red]'}`;
-            $('debug-text').innerText = isGood ? "Halten..." : "Korrigieren";
+            $('debug-text').innerText = isGood ? "Halten!" : "Korrigieren...";
 
             handleLogic(isGood, proximity);
         }
 
         function handleLogic(isGood, proximity) {
-            // Audio Feedback
-            updateAudioFeedback(isGood, proximity, appState.training.level);
-
+            // Audio Feedback Logic:
+            // Wenn GUT: Geiger aus, Sound aus. Warten auf Timer.
+            // Wenn SCHLECHT: Geiger an (schneller je näher dran).
+            
             if (isGood) {
+                stopGeiger(); // Ruhe im Ziel
+                
                 if (appState.training.holdingSince === 0) appState.training.holdingSince = Date.now();
-                if (Date.now() - appState.training.holdingSince > 500) { // 0.5s halten
-                    // REPETITION COMPLETE
+                if (Date.now() - appState.training.holdingSince > 500) { 
+                    // SUCCESS
                     if(Date.now() - (window.lastSuccess||0) > 2000) {
                         playSuccess();
                         window.lastSuccess = Date.now();
                         appState.training.reps++;
                         updateUI();
                         
-                        // TTS Count
                         speak(String(appState.training.reps));
                         
                         $('success-overlay').style.display = 'block';
                         setTimeout(() => $('success-overlay').style.display = 'none', 300);
                         appState.training.holdingSince = 0;
 
-                        // CHECK FINISH
                         if (appState.training.reps >= appState.training.maxReps) {
                             setTimeout(finishLevel, 1000);
                         }
@@ -445,84 +401,67 @@
                 }
             } else {
                 appState.training.holdingSince = 0;
+                // Geiger starten: Interval wird KÜRZER je besser man ist (proximity 1 = 100ms, proximity 0 = 800ms)
+                // Pitch: Tief für Level 1, Hoch für Level 2
+                const interval = 800 - (proximity * 600);
+                startGeiger(interval, appState.training.level === 1 ? "C2" : "C4");
             }
         }
 
-        // --- AUDIO ENGINE V2 (Dissonance) ---
-        let osc1, osc2, lfo, gainNode;
-        let isAudioInit = false;
+        // --- AUDIO ENGINE (GEIGER) ---
+        let membrane, polySynth, geigerLoop;
+        let nextClickTime = 0;
 
         function initAudio() {
-            if(isAudioInit) return;
+            if(membrane) return;
             Tone.start();
+            // MembraneSynth klingt wie ein tiefes "Tock" (Einparkhilfe)
+            membrane = new Tone.MembraneSynth({
+                pitchDecay: 0.05,
+                octaves: 2,
+                oscillator: { type: "sine" },
+                envelope: { attack: 0.001, decay: 0.2, sustain: 0, release: 1 }
+            }).toDestination();
+            membrane.volume.value = -5;
             
-            // Dissonance Engine für Stand
-            osc1 = new Tone.Oscillator(100, "triangle").start();
-            osc2 = new Tone.Oscillator(100, "triangle").start();
-            // LFO für Tremolo (optional)
-            // gainNode
-            const vol = new Tone.Volume(-10).toDestination();
-            
-            osc1.connect(vol);
-            osc2.connect(vol);
-            
-            // Setup für Arm (höherer Ton)
-            // ... nutzen wir dynamisch
-            isAudioInit = true;
+            polySynth = new Tone.PolySynth(Tone.Synth).toDestination();
+            polySynth.volume.value = -5;
+        }
+
+        function startGeiger(interval, note) {
+            if(!membrane) initAudio();
+            const now = Tone.now();
+            if(now > nextClickTime) {
+                membrane.triggerAttackRelease(note, "32n");
+                nextClickTime = now + (interval / 1000);
+            }
         }
         
-        function stopAudio() {
-             if(osc1) { osc1.volume.rampTo(-Infinity, 0.1); osc2.volume.rampTo(-Infinity, 0.1); }
-        }
-
-        function updateAudioFeedback(isGood, proximity, level) {
-            if(!isAudioInit) return;
-
-            // Basis Lautstärke (Lauter wenn gut, leiser wenn schlecht, oder andersrum?
-            // Hier: Immer hörbar als Guide.
-            const baseVol = -10; 
-
-            if (level === 1) {
-                // DISSONANZ MODUS (Stand)
-                // Proximity 1.0 (Gut) -> Detune 0
-                // Proximity 0.0 (Schlecht) -> Detune 30 Hz (Wummern)
-                const detuneAmt = (1 - proximity) * 30; 
-                
-                osc1.frequency.rampTo(100, 0.1);
-                osc2.frequency.rampTo(100 + detuneAmt, 0.1);
-                
-                osc1.volume.rampTo(baseVol, 0.1);
-                osc2.volume.rampTo(baseVol, 0.1);
-                
-            } else {
-                // PITCH MODUS (Arm)
-                // Schlecht = Tief, Gut = Hoch
-                const freq = 200 + (proximity * 400); // 200Hz bis 600Hz
-                osc1.frequency.rampTo(freq, 0.1);
-                osc2.volume.rampTo(-Infinity, 0.1); // Nur ein Oszillator nötig
-                osc1.volume.rampTo(baseVol, 0.1);
-            }
+        function stopGeiger() {
+            // Nichts zu tun, Loop basiert auf Zeitstempel
         }
 
         function playSuccess() {
-            const synth = new Tone.PolySynth(Tone.Synth).toDestination();
-            synth.triggerAttackRelease(["C5", "E5", "G5"], "8n");
+            if(polySynth) polySynth.triggerAttackRelease(["C5", "E5", "G5"], "8n");
         }
 
-        // --- TTS HACK ---
-        let currentUtterance = null; // Global ref prevents Garbage Collection
-        
+        // --- TTS ---
         function initTTS() {
-            if ('speechSynthesis' in window) window.speechSynthesis.speak(new SpeechSynthesisUtterance(""));
+            if ('speechSynthesis' in window) {
+                // Stimmen laden erzwingen
+                window.speechSynthesis.getVoices(); 
+                window.speechSynthesis.speak(new SpeechSynthesisUtterance(""));
+            }
         }
 
         function speak(text) {
             if ('speechSynthesis' in window) {
                 window.speechSynthesis.cancel();
-                currentUtterance = new SpeechSynthesisUtterance(text);
-                currentUtterance.lang = 'de-DE';
-                currentUtterance.rate = 1.1;
-                window.speechSynthesis.speak(currentUtterance);
+                const u = new SpeechSynthesisUtterance(text);
+                u.lang = 'de-DE'; 
+                u.rate = 1.1;
+                u.volume = 1.0; // Max Volume
+                window.speechSynthesis.speak(u);
             }
         }
 
