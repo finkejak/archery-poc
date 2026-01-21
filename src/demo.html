@@ -3,12 +3,12 @@
 <head>
     <meta charset="utf-8"/>
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-    <title>ArcherAI - The Intelligent Home Training Extension</title>
+    <title>ArcherAI - Final Prototype</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1" rel="stylesheet"/>
-    
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/pose/pose.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
@@ -19,12 +19,7 @@
             darkMode: "class",
             theme: {
                 extend: {
-                    colors: {
-                        "primary": "#74b814",
-                        "background-dark": "#1a2111",
-                        "surface-dark": "#262e1c",
-                        "error": "#ef4444"
-                    },
+                    colors: { "primary": "#74b814", "background-dark": "#1a2111", "surface-dark": "#262e1c", "error": "#ef4444" },
                     fontFamily: { "display": ["Lexend", "sans-serif"] },
                 },
             },
@@ -36,21 +31,18 @@
         .screen { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; flex-direction: column; overflow-y: auto; }
         .screen.active { display: flex; }
         
-        /* Video Fix: Video ist sichtbar, Canvas liegt drüber */
         .camera-wrapper { position: relative; flex: 1; background: black; display: flex; justify-content: center; overflow: hidden; }
         .input_video { position: absolute; top:0; left:0; width: 100%; height: 100%; object-fit: cover; z-index: 1; }
         .output_canvas { position: relative; z-index: 10; height: 100%; width: auto; object-fit: cover; }
         
-        #success-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(116,184,20,0.3); z-index: 50; display: none; pointer-events: none; }
-
-        /* Skeleton Illustration CSS */
-        .skeleton-demo { position: relative; width: 100px; height: 150px; border: 2px dashed #444; margin: 0 auto; border-radius: 10px; }
-        .sk-head { width: 20px; height: 20px; border: 2px solid #74b814; border-radius: 50%; position: absolute; top: 10px; left: 38px; }
-        .sk-spine { width: 2px; height: 60px; background: #74b814; position: absolute; top: 32px; left: 48px; }
-        .sk-arm-l { width: 30px; height: 2px; background: #74b814; position: absolute; top: 40px; left: 18px; }
-        .sk-arm-r { width: 30px; height: 2px; background: #74b814; position: absolute; top: 40px; left: 50px; }
-        .sk-leg-l { width: 2px; height: 50px; background: #74b814; position: absolute; top: 90px; left: 38px; transform: rotate(10deg); }
-        .sk-leg-r { width: 2px; height: 50px; background: #74b814; position: absolute; top: 90px; left: 60px; transform: rotate(-10deg); }
+        #success-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(116,184,20,0.4); z-index: 50; display: none; pointer-events: none; }
+        
+        /* Skeleton Animation für Wizard */
+        .skeleton-demo { position: relative; width: 100px; height: 160px; border: 2px dashed #444; margin: 0 auto; border-radius: 10px; opacity: 0.8; }
+        .sk-head { width: 24px; height: 24px; border: 2px solid #74b814; border-radius: 50%; position: absolute; top: 15px; left: 36px; }
+        .sk-body { width: 2px; height: 60px; background: #74b814; position: absolute; top: 39px; left: 47px; }
+        .sk-arm { width: 60px; height: 2px; background: #74b814; position: absolute; top: 45px; left: 18px; }
+        .sk-legs { width: 40px; height: 50px; border-left: 2px solid #74b814; border-right: 2px solid #74b814; border-top: 0; position: absolute; top: 99px; left: 28px; transform: perspective(20px) rotateX(5deg); }
     </style>
 </head>
 
@@ -63,92 +55,109 @@
             <span class="material-symbols-outlined text-primary text-6xl">target</span>
         </div>
         <h1 class="text-4xl font-bold mb-2">Archer<span class="text-primary">AI</span></h1>
-        <p class="text-gray-400 mb-8">Die Intelligente Home Training Extension</p>
+        <p class="text-gray-400 mb-8">Audio-Feedback Coach</p>
         <button onclick="startWizard()" class="w-full max-w-sm py-4 bg-primary text-background-dark font-bold rounded-xl hover:brightness-110 transition">
             Starten
         </button>
     </section>
 
     <section id="screen-wiz-intro" class="screen p-6 justify-center items-center text-center">
-        <h2 id="wiz-title" class="text-2xl font-bold mb-4">Schritt 1: Frontal</h2>
-        <p id="wiz-desc" class="text-gray-400 mb-6">Stelle dich auf die Schusslinie. Die Kamera sieht dich von vorne/hinten.</p>
+        <h2 id="wiz-title" class="text-2xl font-bold mb-4 text-primary">Schritt 1</h2>
+        <p id="wiz-desc" class="text-lg text-gray-300 mb-8 leading-relaxed">...</p>
         
-        <div class="skeleton-demo mb-8 bg-surface-dark">
+        <div class="skeleton-demo mb-8 bg-surface-dark/50">
             <div class="sk-head"></div>
-            <div class="sk-spine"></div>
-            <div class="sk-arm-l"></div><div class="sk-arm-r"></div>
-            <div class="sk-leg-l"></div><div class="sk-leg-r"></div>
+            <div class="sk-body"></div>
+            <div class="sk-arm"></div>
+            <div class="sk-legs"></div>
         </div>
 
         <button onclick="nextWizardStep('upload')" class="w-full max-w-sm py-4 bg-primary text-background-dark font-bold rounded-xl">
-            Verstanden, weiter
+            Alles klar
         </button>
     </section>
 
     <section id="screen-wiz-upload" class="screen p-6 justify-center">
         <div class="flex items-center mb-6">
             <button onclick="prevWizardStep()" class="mr-4 material-symbols-outlined">arrow_back</button>
-            <h2 class="text-xl font-bold">Foto aufnehmen</h2>
+            <h2 class="text-xl font-bold">Aufnahme</h2>
         </div>
         
-        <div class="bg-surface-dark p-6 rounded-xl border border-white/10 text-center">
-            <span class="material-symbols-outlined text-4xl text-primary mb-2">photo_camera</span>
-            <p class="mb-4 text-sm text-gray-400">Wähle ein Bild oder mache ein Foto.</p>
+        <div class="bg-surface-dark p-8 rounded-xl border border-white/10 text-center flex flex-col gap-4">
+            <span class="material-symbols-outlined text-5xl text-primary">add_a_photo</span>
+            <p class="text-gray-400">Lade ein Bild hoch oder nutze die Kamera.</p>
             <input type="file" id="wiz-input" accept="image/*" class="block w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:bg-primary/20 file:text-primary"/>
         </div>
         
         <img id="wiz-img-proc" style="display:none;" />
-        <div id="wiz-loading" class="hidden mt-4 text-center text-primary animate-pulse">Analysiere Pose...</div>
+        <div id="wiz-loading" class="hidden mt-8 text-center text-primary font-bold animate-pulse">Analysiere Körperhaltung...</div>
     </section>
 
     <section id="screen-wiz-verify" class="screen p-6 justify-center items-center text-center">
-        <div class="size-16 rounded-full bg-primary/20 flex items-center justify-center mb-4">
-            <span class="material-symbols-outlined text-primary text-3xl">check</span>
+        <div class="size-20 rounded-full bg-primary/20 flex items-center justify-center mb-6 animate-bounce">
+            <span class="material-symbols-outlined text-primary text-4xl">check</span>
         </div>
-        <h2 class="text-2xl font-bold mb-2">Pose erkannt!</h2>
-        <p id="wiz-result-text" class="text-gray-400 mb-8 font-mono text-sm">Daten wurden gespeichert.</p>
+        <h2 class="text-2xl font-bold mb-2">Erfolgreich!</h2>
+        <p id="wiz-result-text" class="text-gray-400 mb-8 font-mono text-sm bg-surface-dark p-2 rounded">...</p>
         
         <button onclick="confirmWizardStep()" class="w-full max-w-sm py-4 bg-primary text-background-dark font-bold rounded-xl">
-            Bestätigen
+            Weiter
         </button>
-        <button onclick="prevWizardStep()" class="mt-4 text-gray-500 text-sm">Neues Bild wählen</button>
+        <button onclick="prevWizardStep()" class="mt-6 text-gray-500 text-sm underline">Bild wiederholen</button>
     </section>
 
     <section id="screen-home" class="screen bg-background-dark">
         <div class="p-6">
-            <h2 class="text-2xl font-bold mb-1">Hallo, Alex</h2>
-            <p class="text-xs text-gray-400 mb-6">Nächste Einheit wartet.</p>
+            <div class="flex justify-between items-center mb-6">
+                <div>
+                    <h2 class="text-2xl font-bold">Hallo Alex,</h2>
+                    <p class="text-xs text-gray-400">Bereit für die nächste Session?</p>
+                </div>
+            </div>
 
-            <div class="bg-surface-dark rounded-2xl p-5 border border-primary/20 relative overflow-hidden mb-6">
-                <h3 class="text-lg font-bold mb-1">Tägliches Training</h3>
-                <p class="text-sm text-gray-400 mb-4">Übung: <span class="text-primary">Stand & Balance</span></p>
-                <button onclick="startTrainingFlow()" class="w-full py-3 bg-primary text-background-dark font-bold rounded-xl flex items-center justify-center gap-2">
-                    <span class="material-symbols-outlined">play_arrow</span> Starten
+            <div class="bg-surface-dark rounded-2xl p-6 border border-primary/20 relative overflow-hidden mb-8 shadow-lg">
+                <div class="absolute top-0 right-0 p-4 opacity-5">
+                    <span class="material-symbols-outlined text-9xl">fitness_center</span>
+                </div>
+                <h3 class="text-lg font-bold mb-1 text-primary">Level 1: Stand & Balance</h3>
+                <p class="text-sm text-gray-400 mb-6">Fokus: Stabiler Stand (Dissonanz-Feedback)</p>
+                <button onclick="startTrainingFlow()" class="relative z-10 w-full py-4 bg-primary text-background-dark font-bold rounded-xl flex items-center justify-center gap-2 hover:brightness-110">
+                    <span class="material-symbols-outlined">play_arrow</span> Training Starten
                 </button>
             </div>
             
-            <h3 class="font-bold mb-3 text-sm text-gray-500 uppercase">Schnellstart</h3>
-            <div class="grid grid-cols-2 gap-3">
-                 <button onclick="setLevel(1)" class="p-3 bg-surface-dark rounded-xl border border-white/10 text-sm font-bold text-left hover:border-primary">
-                    1. Stand<br><span class="text-xs text-gray-500 font-normal">Frontal</span>
+            <h3 class="font-bold mb-3 text-sm text-gray-500 uppercase tracking-wider">Level Auswahl</h3>
+            <div class="flex flex-col gap-3">
+                 <button onclick="setLevel(1)" class="p-4 bg-surface-dark rounded-xl border border-white/5 flex justify-between items-center hover:border-primary transition">
+                    <div class="text-left">
+                        <span class="block font-bold">1. Stand & Balance</span>
+                        <span class="text-xs text-gray-500">Audio: Dissonanz (Tief)</span>
+                    </div>
+                    <span class="material-symbols-outlined text-gray-600">chevron_right</span>
                  </button>
-                 <button onclick="setLevel(2)" class="p-3 bg-surface-dark rounded-xl border border-white/10 text-sm font-bold text-left hover:border-primary">
-                    2. Setup<br><span class="text-xs text-gray-500 font-normal">Seitlich</span>
-                 </button>
-                 <button onclick="setLevel(3)" class="p-3 bg-surface-dark rounded-xl border border-white/10 text-sm font-bold text-left hover:border-primary">
-                    3. Auszug<br><span class="text-xs text-gray-500 font-normal">Seitlich</span>
+                 <button onclick="setLevel(2)" class="p-4 bg-surface-dark rounded-xl border border-white/5 flex justify-between items-center hover:border-primary transition">
+                    <div class="text-left">
+                        <span class="block font-bold">2. Setup (Arm)</span>
+                        <span class="text-xs text-gray-500">Audio: Höhe (Mittel)</span>
+                    </div>
+                    <span class="material-symbols-outlined text-gray-600">chevron_right</span>
                  </button>
             </div>
         </div>
     </section>
 
     <section id="screen-safety" class="screen p-6 justify-center items-center text-center bg-red-900/10">
-        <span class="material-symbols-outlined text-error text-6xl mb-4">warning</span>
-        <h2 class="text-2xl font-bold text-white mb-2">Sicherheit</h2>
-        <div class="bg-surface-dark p-4 rounded-xl border border-error/50 mb-8 max-w-sm text-left">
-            <p class="text-sm text-gray-300">⚠️ <strong>Niemals trockenfeuern!</strong><br>Nutze ein Gummiband oder ziehe den Bogen nur aus, ohne zu lösen.</p>
+        <span class="material-symbols-outlined text-error text-6xl mb-4">gpp_maybe</span>
+        <h2 class="text-2xl font-bold text-white mb-2">Sicherheitshinweis</h2>
+        <div class="bg-surface-dark p-6 rounded-xl border border-error/30 mb-8 max-w-sm text-left shadow-xl">
+            <p class="text-gray-300 leading-relaxed">
+                ⚠️ <strong>Niemals ohne Pfeil lösen (Dry Fire).</strong><br><br>
+                Nutze bitte ein <strong>Theraband</strong> oder übe nur den Auszug ohne Lösen.
+            </p>
         </div>
-        <button onclick="confirmSafety()" class="w-full max-w-sm py-4 bg-white text-black font-bold rounded-xl">Verstanden</button>
+        <button onclick="confirmSafety()" class="w-full max-w-sm py-4 bg-white text-black font-bold rounded-xl hover:bg-gray-200">
+            Verstanden
+        </button>
     </section>
 
     <section id="screen-live" class="screen bg-black">
@@ -156,69 +165,77 @@
             <video class="input_video" playsinline autoplay muted></video>
             <canvas class="output_canvas"></canvas>
             
-            <div class="absolute top-0 left-0 w-full p-4 flex justify-between items-start bg-gradient-to-b from-black/80 to-transparent z-20">
+            <div class="absolute top-0 left-0 w-full p-4 pt-6 flex justify-between items-start bg-gradient-to-b from-black/90 to-transparent z-20">
                 <div>
-                    <div class="text-xs text-gray-400">REPS</div>
-                    <div class="text-4xl font-mono font-bold text-white" id="rep-counter">0<span class="text-lg text-gray-500">/5</span></div>
+                    <div class="text-[10px] tracking-widest text-gray-400 uppercase">Wiederholungen</div>
+                    <div class="text-5xl font-mono font-bold text-white tracking-tighter" id="rep-counter">0<span class="text-2xl text-gray-600 font-normal">/5</span></div>
                 </div>
                 
-                <div class="flex flex-col items-end gap-2">
-                    <div class="px-4 py-2 bg-surface-dark/90 border border-primary text-primary text-sm font-bold rounded-lg shadow-lg flex items-center gap-2 backdrop-blur-md">
-                        <span class="material-symbols-outlined text-base">visibility</span>
-                        <div class="flex flex-col text-right">
-                            <span class="text-[10px] text-gray-400 uppercase leading-none">Fokus</span>
-                            <span id="focus-text" class="leading-none">STAND</span>
-                        </div>
+                <div class="flex flex-col items-end gap-3">
+                    <div class="px-3 py-1 bg-surface-dark/80 border border-primary/50 text-primary text-xs font-bold rounded-full flex items-center gap-2 backdrop-blur">
+                        <span class="material-symbols-outlined text-sm">visibility</span>
+                        <span id="focus-text">STAND</span>
                     </div>
                     
-                    <button onclick="stopTraining()" class="size-10 rounded-full bg-white/10 flex items-center justify-center text-white mt-2 hover:bg-red-500">
+                    <button onclick="stopTraining()" class="size-10 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-red-500/80 transition">
                         <span class="material-symbols-outlined">close</span>
                     </button>
                 </div>
             </div>
 
-            <div class="absolute bottom-0 left-0 w-full p-6 bg-gradient-to-t from-black/90 to-transparent text-center z-20">
-                <button onclick="restartCamera()" class="text-xs text-gray-500 underline mb-2">Kamera neu starten</button>
-                <div id="debug-text" class="text-sm text-gray-400 mb-1 font-mono">Suche Pose...</div>
-                <div class="w-full h-2 bg-gray-700 rounded-full overflow-hidden">
-                    <div id="prox-bar" class="h-full bg-primary w-0 transition-all duration-100"></div>
+            <div class="absolute bottom-0 left-0 w-full p-6 pb-8 bg-gradient-to-t from-black/90 to-transparent text-center z-20">
+                <button onclick="startCameraStream()" class="text-[10px] text-gray-600 uppercase mb-2">Kamera Neustart</button>
+                <div id="debug-text" class="text-sm text-gray-300 mb-2 font-mono">Suche Körper...</div>
+                
+                <div class="w-full h-3 bg-gray-800 rounded-full overflow-hidden border border-white/10">
+                    <div id="prox-bar" class="h-full bg-primary w-0 transition-all duration-200 ease-out shadow-[0_0_10px_#74b814]"></div>
                 </div>
             </div>
         </div>
     </section>
 
+    <section id="screen-summary" class="screen p-6 justify-center items-center text-center">
+        <div class="size-32 rounded-full border-4 border-primary flex items-center justify-center mb-6 relative shadow-[0_0_20px_rgba(116,184,20,0.3)]">
+            <span class="text-4xl font-bold text-white">100%</span>
+            <div class="absolute -bottom-3 bg-surface-dark px-3 py-1 rounded border border-primary text-primary font-bold text-xs uppercase">Abgeschlossen</div>
+        </div>
+        <h2 class="text-3xl font-bold mb-2">Starkes Training!</h2>
+        <p class="text-gray-400 mb-10 max-w-xs">Du hast 5 saubere Wiederholungen absolviert.</p>
+        
+        <button onclick="showScreen('home')" class="w-full max-w-sm py-4 bg-surface-dark text-white font-bold rounded-xl border border-white/10 hover:bg-surface-dark/80">
+            Zurück zum Dashboard
+        </button>
+    </section>
+
     <script>
-        // --- 1. CONFIG & STATE ---
+        // --- CONFIG ---
         const EXERCISES = {
-            1: { name: "Stand", focus: "GERADE HÜFTE", ref: "front" },
+            1: { name: "Stand", focus: "STANDBREITE", ref: "front" },
             2: { name: "Setup", focus: "ARM HÖHE", ref: "side" },
             3: { name: "Auszug", focus: "ANKER", ref: "side" }
         };
 
         const appState = {
             calib: { front: null, side: null },
-            wizard: { step: 'front' }, // 'front' or 'side'
+            wizard: { step: 'front' }, 
             training: { level: 1, reps: 0, maxReps: 5, holdingSince: 0, isActive: false }
         };
 
-        // DOM Elements
+        // --- DOM ---
         const $ = id => document.getElementById(id);
         const screens = document.querySelectorAll('.screen');
         const video = document.querySelector('.input_video');
         const canvas = document.querySelector('.output_canvas');
         const ctx = canvas.getContext('2d');
-
-        // --- 2. NAVIGATION & WIZARD ---
+        
+        // --- NAVIGATION ---
         function showScreen(id) {
             screens.forEach(s => s.classList.remove('active'));
             $(`screen-${id}`).classList.add('active');
         }
 
         function startWizard() {
-            // TTS Warmup
-            if ('speechSynthesis' in window) window.speechSynthesis.speak(new SpeechSynthesisUtterance(""));
-            
-            // Reset & Start with Front
+            initTTS(); // Warmup Voice
             appState.wizard.step = 'front';
             updateWizardUI();
             showScreen('wiz-intro');
@@ -227,20 +244,15 @@
         function updateWizardUI() {
             const isFront = appState.wizard.step === 'front';
             $('wiz-title').innerText = isFront ? "Schritt 1: Frontal" : "Schritt 2: Seitlich";
+            // WEICHERE TEXTE
             $('wiz-desc').innerText = isFront 
-                ? "Kamera auf der Schusslinie. Wir messen Standbreite." 
-                : "Kamera im 90° Winkel (Profil). Wir messen Armwinkel.";
-            // Clear inputs
+                ? "Positioniere die Kamera auf der Schusslinie. Wir schauen uns deinen Stand von vorne an." 
+                : "Positioniere die Kamera im 90° Winkel zu dir. Wir schauen uns dein Profil an.";
             $('wiz-input').value = "";
         }
 
-        function nextWizardStep(target) {
-            showScreen(`wiz-${target}`);
-        }
-
-        function prevWizardStep() {
-            showScreen('wiz-intro');
-        }
+        function nextWizardStep(target) { showScreen(`wiz-${target}`); }
+        function prevWizardStep() { showScreen('wiz-intro'); }
 
         function confirmWizardStep() {
             if(appState.wizard.step === 'front') {
@@ -248,21 +260,15 @@
                 updateWizardUI();
                 showScreen('wiz-intro');
             } else {
-                finishCalibration();
+                showScreen('home');
             }
         }
 
-        function finishCalibration() {
-            // Save to LocalStorage if needed
-            showScreen('home');
-        }
-
-        // --- 3. CALIBRATION LOGIC ---
+        // --- CALIBRATION (MediaPipe Static) ---
         const poseStatic = new Pose({locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/pose/${file}`});
         poseStatic.setOptions({modelComplexity: 1});
         poseStatic.onResults(handleWizResults);
 
-        // Setup File Input Listener
         $('wiz-input').addEventListener('change', (e) => {
             const file = e.target.files[0];
             if(file) {
@@ -275,36 +281,25 @@
 
         function handleWizResults(results) {
             $('wiz-loading').classList.add('hidden');
-            
-            if(!results.poseLandmarks) {
-                alert("Keine Person erkannt. Bitte versuche es erneut.");
-                return;
-            }
+            if(!results.poseLandmarks) { alert("Keine Person erkannt."); return; }
 
             const lm = results.poseLandmarks;
-            const step = appState.wizard.step;
-
-            if (step === 'front') {
-                // Save Front Data (Shoulder/Foot Ratio)
-                const shoulderW = Math.abs(lm[11].x - lm[12].x);
-                const footW = Math.abs(lm[27].x - lm[28].x);
-                const ratio = shoulderW > 0 ? footW / shoulderW : 0.5;
-                appState.calib.front = { ratio: ratio };
-                $('wiz-result-text').innerText = `Stand-Verhältnis: ${ratio.toFixed(2)}`;
+            if (appState.wizard.step === 'front') {
+                const sW = Math.abs(lm[11].x - lm[12].x);
+                const fW = Math.abs(lm[27].x - lm[28].x);
+                appState.calib.front = { ratio: sW > 0 ? fW/sW : 0.5 };
+                $('wiz-result-text').innerText = "Standbreite analysiert.";
             } else {
-                // Save Side Data (Arm Angle)
-                const armAngle = calculateAngle(lm[11], lm[13], lm[15]);
-                appState.calib.side = { bowArm: armAngle };
-                $('wiz-result-text').innerText = `Arm-Winkel: ${armAngle.toFixed(0)}°`;
+                appState.calib.side = { bowArm: calculateAngle(lm[11], lm[13], lm[15]) };
+                $('wiz-result-text').innerText = "Armwinkel analysiert.";
             }
-
             showScreen('wiz-verify');
         }
 
-        // --- 4. TRAINING FLOW ---
+        // --- TRAINING FLOW ---
         function startTrainingFlow() {
             showScreen('safety');
-            speak("Bitte Sicherheitshinweise beachten.");
+            speak("Bitte Sicherheitshinweis beachten.");
         }
 
         function setLevel(lvl) {
@@ -319,11 +314,19 @@
 
         function stopTraining() {
             appState.training.isActive = false;
-            updateDrone(false);
+            stopAudio();
             showScreen('home');
         }
+        
+        function finishLevel() {
+            appState.training.isActive = false;
+            stopAudio();
+            playSuccess(); // Finaler Sound
+            speak("Einheit abgeschlossen. Gute Arbeit.");
+            showScreen('summary');
+        }
 
-        // --- 5. LIVE CAMERA & LOGIC ---
+        // --- LIVE CAMERA ---
         const poseLive = new Pose({locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/pose/${file}`});
         poseLive.setOptions({modelComplexity: 1, smoothLandmarks: true});
         poseLive.onResults(onLiveResults);
@@ -331,155 +334,195 @@
         async function startLiveSession() {
             appState.training.isActive = true;
             appState.training.reps = 0;
+            updateUI();
             
-            const exercise = EXERCISES[appState.training.level] || EXERCISES[1];
-            $('focus-text').innerText = exercise.focus;
-            speak(`Training gestartet. Fokus: ${exercise.focus}`);
+            const ex = EXERCISES[appState.training.level];
+            $('focus-text').innerText = ex.focus;
+            speak(`Training gestartet. Fokus auf ${ex.focus}`);
             
             initAudio();
             startCameraStream();
         }
 
+        function updateUI() {
+            $('rep-counter').innerHTML = `${appState.training.reps}<span class="text-2xl text-gray-600 font-normal">/5</span>`;
+        }
+
         async function startCameraStream() {
             try {
-                // ULTRA BASIC CONSTRAINTS FOR BRAVE/MOBILE
                 const stream = await navigator.mediaDevices.getUserMedia({ 
-                    video: { facingMode: 'environment' }, // Keine Width/Height Vorgabe!
+                    video: { facingMode: 'environment' }, 
                     audio: false 
                 });
                 video.srcObject = stream;
-                video.onloadedmetadata = () => {
-                    video.play();
-                    processLoop();
-                };
+                video.onloadedmetadata = () => { video.play(); processLoop(); };
             } catch(e) {
-                alert("Kamera-Fehler: " + e.message + "\nPrüfe 'Brave Shields' oder Permissions.");
+                alert("Kamera-Fehler. Prüfe Berechtigungen.");
             }
-        }
-
-        function restartCamera() {
-            if(video.srcObject) {
-                video.srcObject.getTracks().forEach(t => t.stop());
-            }
-            startCameraStream();
         }
 
         async function processLoop() {
             if(appState.training.isActive) {
-                // Nur senden wenn Video läuft
-                if(video.readyState >= 2) {
-                    await poseLive.send({image: video});
-                }
+                if(video.readyState >= 2) await poseLive.send({image: video});
                 requestAnimationFrame(processLoop);
             }
         }
 
         function onLiveResults(results) {
-            // Draw
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
+            canvas.width = video.videoWidth; canvas.height = video.videoHeight;
             ctx.clearRect(0,0,canvas.width,canvas.height);
             
-            // Wenn Video da ist, aber kein Resultat, bleibt Canvas leer (Video sichtbar dahinter)
-            // Wir zeichnen nur Overlay
             if(results.poseLandmarks) {
-                // High Contrast Style
+                // High Contrast Outline
                 drawConnectors(ctx, results.poseLandmarks, POSE_CONNECTIONS, {color: '#000000', lineWidth: 6});
                 drawLandmarks(ctx, results.poseLandmarks, {color: '#000000', lineWidth: 6});
                 drawConnectors(ctx, results.poseLandmarks, POSE_CONNECTIONS, {color: '#74b814', lineWidth: 3});
                 drawLandmarks(ctx, results.poseLandmarks, {color: '#FFFFFF', lineWidth: 2});
                 
-                // --- KERN LOGIK AUFRUF ---
                 evaluatePose(results.poseLandmarks);
             }
         }
 
         function evaluatePose(lm) {
-            const exercise = EXERCISES[appState.training.level];
-            let isGood = false;
+            const ex = EXERCISES[appState.training.level];
             let diff = 0;
+            let tolerance = 0.2;
 
-            if (exercise.ref === 'front' && appState.calib.front) {
-                // Compare Front Ratio
-                const shoulderW = Math.abs(lm[11].x - lm[12].x);
-                const footW = Math.abs(lm[27].x - lm[28].x);
-                const currentRatio = shoulderW > 0 ? footW / shoulderW : 0;
-                diff = Math.abs(currentRatio - appState.calib.front.ratio);
-                isGood = diff < 0.2; // Toleranz
+            // Logic Switch
+            if (ex.ref === 'front' && appState.calib.front) {
+                const sW = Math.abs(lm[11].x - lm[12].x);
+                const fW = Math.abs(lm[27].x - lm[28].x);
+                const cur = sW > 0 ? fW/sW : 0;
+                diff = Math.abs(cur - appState.calib.front.ratio);
+                tolerance = 0.25;
             } 
-            else if (exercise.ref === 'side' && appState.calib.side) {
-                // Compare Side Arm
-                const currentArm = calculateAngle(lm[11], lm[13], lm[15]);
-                diff = Math.abs(currentArm - appState.calib.side.bowArm);
-                isGood = diff < 15; // 15 Grad Toleranz
+            else if (ex.ref === 'side' && appState.calib.side) {
+                const cur = calculateAngle(lm[11], lm[13], lm[15]);
+                diff = Math.abs(cur - appState.calib.side.bowArm);
+                tolerance = 15;
             } 
-            else {
-                // Fallback / Simulation
-                isGood = true; 
-            }
+            else { diff = 0; } // Simulation
 
-            // UI Feedback
-            const proximity = Math.max(0, 1 - (diff / (exercise.ref==='front'? 0.5 : 45)));
+            const isGood = diff < tolerance;
+            // Map diff to 0..1 (Proximity)
+            const range = ex.ref === 'front' ? 0.5 : 45;
+            const proximity = Math.max(0, 1 - (diff / range));
+
+            // Feedback UI
             $('prox-bar').style.width = `${proximity * 100}%`;
-            $('prox-bar').className = `h-full transition-all ${isGood ? 'bg-primary' : 'bg-error'}`;
-            $('debug-text').innerText = isGood ? "Gute Haltung" : "Korigieren...";
+            $('prox-bar').className = `h-full transition-all ${isGood ? 'bg-primary' : 'bg-error shadow-[0_0_10px_red]'}`;
+            $('debug-text').innerText = isGood ? "Halten..." : "Korrigieren";
 
-            handleAudioFeedback(isGood, proximity);
+            handleLogic(isGood, proximity);
         }
 
-        function handleAudioFeedback(isGood, proximity) {
+        function handleLogic(isGood, proximity) {
+            // Audio Feedback
+            updateAudioFeedback(isGood, proximity, appState.training.level);
+
             if (isGood) {
-                updateDrone(true, 1.0);
                 if (appState.training.holdingSince === 0) appState.training.holdingSince = Date.now();
-                
-                if (Date.now() - appState.training.holdingSince > 300) {
-                    // SUCCESS
+                if (Date.now() - appState.training.holdingSince > 500) { // 0.5s halten
+                    // REPETITION COMPLETE
                     if(Date.now() - (window.lastSuccess||0) > 2000) {
                         playSuccess();
                         window.lastSuccess = Date.now();
                         appState.training.reps++;
-                        $('rep-counter').innerHTML = `${appState.training.reps}<span class="text-lg text-gray-500">/5</span>`;
+                        updateUI();
+                        
+                        // TTS Count
                         speak(String(appState.training.reps));
                         
-                        // Show Overlay briefly
                         $('success-overlay').style.display = 'block';
-                        setTimeout(() => $('success-overlay').style.display = 'none', 200);
+                        setTimeout(() => $('success-overlay').style.display = 'none', 300);
+                        appState.training.holdingSince = 0;
+
+                        // CHECK FINISH
+                        if (appState.training.reps >= appState.training.maxReps) {
+                            setTimeout(finishLevel, 1000);
+                        }
                     }
                 }
             } else {
                 appState.training.holdingSince = 0;
-                updateDrone(true, 0.3);
-                // Geigerzähler Logic optional here
             }
         }
 
-        // --- AUDIO HELPERS ---
-        let drone, polySynth;
-        
+        // --- AUDIO ENGINE V2 (Dissonance) ---
+        let osc1, osc2, lfo, gainNode;
+        let isAudioInit = false;
+
         function initAudio() {
-            if(drone || Tone.context.state === 'running') return;
+            if(isAudioInit) return;
             Tone.start();
-            drone = new Tone.FatOscillator({type: "triangle", frequency: 110, spread: 20, count: 3}).toDestination();
-            drone.volume.value = -Infinity;
-            drone.start();
-            polySynth = new Tone.PolySynth(Tone.Synth).toDestination();
+            
+            // Dissonance Engine für Stand
+            osc1 = new Tone.Oscillator(100, "triangle").start();
+            osc2 = new Tone.Oscillator(100, "triangle").start();
+            // LFO für Tremolo (optional)
+            // gainNode
+            const vol = new Tone.Volume(-10).toDestination();
+            
+            osc1.connect(vol);
+            osc2.connect(vol);
+            
+            // Setup für Arm (höherer Ton)
+            // ... nutzen wir dynamisch
+            isAudioInit = true;
+        }
+        
+        function stopAudio() {
+             if(osc1) { osc1.volume.rampTo(-Infinity, 0.1); osc2.volume.rampTo(-Infinity, 0.1); }
         }
 
-        function updateDrone(active, vol) {
-            if(!drone) return;
-            drone.volume.rampTo(active ? -30 + (vol*20) : -Infinity, 0.1);
+        function updateAudioFeedback(isGood, proximity, level) {
+            if(!isAudioInit) return;
+
+            // Basis Lautstärke (Lauter wenn gut, leiser wenn schlecht, oder andersrum?
+            // Hier: Immer hörbar als Guide.
+            const baseVol = -10; 
+
+            if (level === 1) {
+                // DISSONANZ MODUS (Stand)
+                // Proximity 1.0 (Gut) -> Detune 0
+                // Proximity 0.0 (Schlecht) -> Detune 30 Hz (Wummern)
+                const detuneAmt = (1 - proximity) * 30; 
+                
+                osc1.frequency.rampTo(100, 0.1);
+                osc2.frequency.rampTo(100 + detuneAmt, 0.1);
+                
+                osc1.volume.rampTo(baseVol, 0.1);
+                osc2.volume.rampTo(baseVol, 0.1);
+                
+            } else {
+                // PITCH MODUS (Arm)
+                // Schlecht = Tief, Gut = Hoch
+                const freq = 200 + (proximity * 400); // 200Hz bis 600Hz
+                osc1.frequency.rampTo(freq, 0.1);
+                osc2.volume.rampTo(-Infinity, 0.1); // Nur ein Oszillator nötig
+                osc1.volume.rampTo(baseVol, 0.1);
+            }
         }
 
         function playSuccess() {
-            if(polySynth) polySynth.triggerAttackRelease(["C5", "E5", "G5"], "8n");
+            const synth = new Tone.PolySynth(Tone.Synth).toDestination();
+            synth.triggerAttackRelease(["C5", "E5", "G5"], "8n");
+        }
+
+        // --- TTS HACK ---
+        let currentUtterance = null; // Global ref prevents Garbage Collection
+        
+        function initTTS() {
+            if ('speechSynthesis' in window) window.speechSynthesis.speak(new SpeechSynthesisUtterance(""));
         }
 
         function speak(text) {
             if ('speechSynthesis' in window) {
                 window.speechSynthesis.cancel();
-                const u = new SpeechSynthesisUtterance(text);
-                u.lang = 'de-DE'; u.rate = 1.1;
-                window.speechSynthesis.speak(u);
+                currentUtterance = new SpeechSynthesisUtterance(text);
+                currentUtterance.lang = 'de-DE';
+                currentUtterance.rate = 1.1;
+                window.speechSynthesis.speak(currentUtterance);
             }
         }
 
@@ -489,12 +532,10 @@
             if (angle > 180.0) angle = 360 - angle;
             return angle;
         }
-
-        // --- SIMULATION (Key S) ---
+        
+        // Sim Key S
         document.addEventListener('keydown', e => {
-            if(e.key.toLowerCase() === 's' && appState.training.isActive) {
-                 handleAudioFeedback(true, 1.0);
-            }
+            if(e.key === 's' && appState.training.isActive) handleLogic(true, 1.0);
         });
     </script>
 </body>
