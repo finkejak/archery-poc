@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8"/>
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-    <title>ArcherAI - Geiger Edition</title>
+    <title>ArcherAI - Balance Edition</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1" rel="stylesheet"/>
@@ -55,7 +55,7 @@
             <span class="material-symbols-outlined text-primary text-6xl">target</span>
         </div>
         <h1 class="text-4xl font-bold mb-2">Archer<span class="text-primary">AI</span></h1>
-        <p class="text-gray-400 mb-8">Audio-Feedback Coach</p>
+        <p class="text-gray-400 mb-8">Balance & Form Coach</p>
         <button onclick="startWizard()" class="w-full max-w-sm py-4 bg-primary text-background-dark font-bold rounded-xl hover:brightness-110 transition">
             Starten
         </button>
@@ -88,7 +88,7 @@
         <div class="size-20 rounded-full bg-primary/20 flex items-center justify-center mb-6 animate-bounce">
             <span class="material-symbols-outlined text-primary text-4xl">check</span>
         </div>
-        <h2 class="text-2xl font-bold mb-2">Erfolgreich!</h2>
+        <h2 class="text-2xl font-bold mb-2">Gespeichert!</h2>
         <p id="wiz-result-text" class="text-gray-400 mb-8 font-mono text-sm bg-surface-dark p-2 rounded">...</p>
         <button onclick="confirmWizardStep()" class="w-full max-w-sm py-4 bg-primary text-background-dark font-bold rounded-xl">Weiter</button>
     </section>
@@ -102,8 +102,8 @@
                 </div>
             </div>
             <div class="bg-surface-dark rounded-2xl p-6 border border-primary/20 relative overflow-hidden mb-8 shadow-lg">
-                <h3 class="text-lg font-bold mb-1 text-primary">Level 1: Stand & Balance</h3>
-                <p class="text-sm text-gray-400 mb-6">Fokus: Stabiler Stand</p>
+                <h3 class="text-lg font-bold mb-1 text-primary">Level 1: Balance</h3>
+                <p class="text-sm text-gray-400 mb-6">Fokus: Nicht zum Ziel neigen</p>
                 <button onclick="startTrainingFlow()" class="relative z-10 w-full py-4 bg-primary text-background-dark font-bold rounded-xl flex items-center justify-center gap-2 hover:brightness-110">
                     <span class="material-symbols-outlined">play_arrow</span> Training Starten
                 </button>
@@ -111,11 +111,11 @@
             <h3 class="font-bold mb-3 text-sm text-gray-500 uppercase tracking-wider">Level Auswahl</h3>
             <div class="flex flex-col gap-3">
                  <button onclick="setLevel(1)" class="p-4 bg-surface-dark rounded-xl border border-white/5 flex justify-between items-center hover:border-primary transition">
-                    <div class="text-left"><span class="block font-bold">1. Stand & Balance</span><span class="text-xs text-gray-500">Audio: Pochen (Tief)</span></div>
+                    <div class="text-left"><span class="block font-bold">1. Balance Check</span><span class="text-xs text-gray-500">Ansicht: Schusslinie (Schulter)</span></div>
                     <span class="material-symbols-outlined text-gray-600">chevron_right</span>
                  </button>
                  <button onclick="setLevel(2)" class="p-4 bg-surface-dark rounded-xl border border-white/5 flex justify-between items-center hover:border-primary transition">
-                    <div class="text-left"><span class="block font-bold">2. Setup (Arm)</span><span class="text-xs text-gray-500">Audio: Pochen (Höher)</span></div>
+                    <div class="text-left"><span class="block font-bold">2. Arm Höhe</span><span class="text-xs text-gray-500">Ansicht: Frontal (Bauch)</span></div>
                     <span class="material-symbols-outlined text-gray-600">chevron_right</span>
                  </button>
             </div>
@@ -143,7 +143,7 @@
                 </div>
                 <div class="flex flex-col items-end gap-3">
                     <div class="px-3 py-1 bg-surface-dark/80 border border-primary/50 text-primary text-xs font-bold rounded-full flex items-center gap-2 backdrop-blur">
-                        <span class="material-symbols-outlined text-sm">visibility</span><span id="focus-text">STAND</span>
+                        <span class="material-symbols-outlined text-sm">visibility</span><span id="focus-text">BALANCE</span>
                     </div>
                     <button onclick="stopTraining()" class="size-10 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-red-500/80 transition"><span class="material-symbols-outlined">close</span></button>
                 </div>
@@ -163,22 +163,21 @@
         <div class="size-32 rounded-full border-4 border-primary flex items-center justify-center mb-6 relative shadow-[0_0_20px_rgba(116,184,20,0.3)]">
             <span class="text-4xl font-bold text-white">100%</span>
         </div>
-        <h2 class="text-3xl font-bold mb-2">Starkes Training!</h2>
-        <p class="text-gray-400 mb-10 max-w-xs">Du hast 5 saubere Wiederholungen absolviert.</p>
-        <button onclick="showScreen('home')" class="w-full max-w-sm py-4 bg-surface-dark text-white font-bold rounded-xl border border-white/10">Zurück zum Dashboard</button>
+        <h2 class="text-3xl font-bold mb-2">Training beendet</h2>
+        <p class="text-gray-400 mb-10 max-w-xs">Deine Balance war sehr stabil.</p>
+        <button onclick="showScreen('home')" class="w-full max-w-sm py-4 bg-surface-dark text-white font-bold rounded-xl border border-white/10">Zurück</button>
     </section>
 
     <script>
         // --- CONFIG ---
         const EXERCISES = {
-            1: { name: "Stand", focus: "STANDBREITE", ref: "front" },
-            2: { name: "Setup", focus: "ARM HÖHE", ref: "side" },
-            3: { name: "Auszug", focus: "ANKER", ref: "side" }
+            1: { name: "Balance", focus: "KÖRPER LOT", ref: "line" }, // Schusslinie
+            2: { name: "Arm", focus: "ARM HÖHE", ref: "chest" }       // 90 Grad
         };
 
         const appState = {
-            calib: { front: null, side: null },
-            wizard: { step: 'front' }, 
+            calib: { line: null, chest: null },
+            wizard: { step: 'line' }, 
             training: { level: 1, reps: 0, maxReps: 5, holdingSince: 0, isActive: false }
         };
 
@@ -197,18 +196,18 @@
 
         function startWizard() {
             initTTS(); 
-            appState.wizard.step = 'front';
+            appState.wizard.step = 'line';
             updateWizardUI();
             showScreen('wiz-intro');
         }
 
         function updateWizardUI() {
-            const isFront = appState.wizard.step === 'front';
-            $('wiz-title').innerText = isFront ? "Schritt 1: Frontal" : "Schritt 2: Seitlich";
-            // Freundlichere Texte
-            $('wiz-desc').innerText = isFront 
-                ? "Stelle dich auf die Schusslinie. Die Kamera schaut von vorne auf dich." 
-                : "Dreh dich um 90 Grad. Die Kamera schaut jetzt auf dein Profil.";
+            const isLine = appState.wizard.step === 'line';
+            $('wiz-title').innerText = isLine ? "Schritt 1: Schusslinie" : "Schritt 2: Frontal (Bauch)";
+            
+            $('wiz-desc').innerText = isLine 
+                ? "Stelle dich auf die Schusslinie. Die Kamera sieht deine Schulter (Profil)." 
+                : "Dreh dich zur Kamera (90°). Die Kamera sieht deinen Brustkorb/Bauch.";
             $('wiz-input').value = "";
         }
 
@@ -216,8 +215,8 @@
         function prevWizardStep() { showScreen('wiz-intro'); }
 
         function confirmWizardStep() {
-            if(appState.wizard.step === 'front') {
-                appState.wizard.step = 'side';
+            if(appState.wizard.step === 'line') {
+                appState.wizard.step = 'chest';
                 updateWizardUI();
                 showScreen('wiz-intro');
             } else {
@@ -245,46 +244,34 @@
             if(!results.poseLandmarks) { alert("Keine Person erkannt."); return; }
 
             const lm = results.poseLandmarks;
-            if (appState.wizard.step === 'front') {
-                const sW = Math.abs(lm[11].x - lm[12].x);
-                const fW = Math.abs(lm[27].x - lm[28].x);
-                appState.calib.front = { ratio: sW > 0 ? fW/sW : 0.5 };
-                $('wiz-result-text').innerText = "Standbreite gespeichert.";
+            if (appState.wizard.step === 'line') {
+                // BALANCE (Verticality): Save Nose-to-Hip alignment
+                // We normalize by body height (Shoulder Y - Hip Y)
+                const noseX = lm[0].x;
+                const hipX = (lm[23].x + lm[24].x) / 2;
+                const bodyH = Math.abs(lm[11].y - lm[23].y);
+                
+                const lean = (noseX - hipX) / (bodyH || 1); // Should be ~0 if straight
+                
+                appState.calib.line = { leanRef: lean };
+                $('wiz-result-text').innerText = `Balance gespeichert (Offset: ${lean.toFixed(2)})`;
             } else {
-                appState.calib.side = { bowArm: calculateAngle(lm[11], lm[13], lm[15]) };
+                // ARM: Save Arm Angle
+                appState.calib.chest = { bowArm: calculateAngle(lm[11], lm[13], lm[15]) };
                 $('wiz-result-text').innerText = "Armwinkel gespeichert.";
             }
             showScreen('wiz-verify');
         }
 
         // --- TRAINING ---
-        function startTrainingFlow() {
-            showScreen('safety');
-            speak("Bitte Sicherheitshinweis beachten.");
-        }
-
-        function setLevel(lvl) {
-            appState.training.level = lvl;
-            startTrainingFlow();
-        }
-
-        function confirmSafety() {
-            showScreen('live');
-            startLiveSession();
-        }
-
-        function stopTraining() {
-            appState.training.isActive = false;
-            stopGeiger();
-            showScreen('home');
-        }
+        function startTrainingFlow() { showScreen('safety'); speak("Achte auf Sicherheit."); }
+        function setLevel(lvl) { appState.training.level = lvl; startTrainingFlow(); }
+        function confirmSafety() { showScreen('live'); startLiveSession(); }
+        function stopTraining() { appState.training.isActive = false; stopGeiger(); showScreen('home'); }
         
         function finishLevel() {
-            appState.training.isActive = false;
-            stopGeiger();
-            playSuccess(); 
-            speak("Training beendet. Sehr gut.");
-            showScreen('summary');
+            appState.training.isActive = false; stopGeiger();
+            playSuccess(); speak("Training fertig."); showScreen('summary');
         }
 
         // --- LIVE CAMERA ---
@@ -299,7 +286,7 @@
             
             const ex = EXERCISES[appState.training.level];
             $('focus-text').innerText = ex.focus;
-            speak(`Training gestartet. Achte auf ${ex.focus}`);
+            speak(`Start. Fokus: ${ex.focus}`);
             
             initAudio();
             startCameraStream();
@@ -312,14 +299,11 @@
         async function startCameraStream() {
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({ 
-                    video: { facingMode: 'environment' }, 
-                    audio: false 
+                    video: { facingMode: 'environment' }, audio: false 
                 });
                 video.srcObject = stream;
                 video.onloadedmetadata = () => { video.play(); processLoop(); };
-            } catch(e) {
-                alert("Kamera-Fehler.");
-            }
+            } catch(e) { alert("Kamera Fehler."); }
         }
 
         async function processLoop() {
@@ -334,6 +318,7 @@
             ctx.clearRect(0,0,canvas.width,canvas.height);
             
             if(results.poseLandmarks) {
+                // Outline Style
                 drawConnectors(ctx, results.poseLandmarks, POSE_CONNECTIONS, {color: '#000000', lineWidth: 6});
                 drawLandmarks(ctx, results.poseLandmarks, {color: '#000000', lineWidth: 6});
                 drawConnectors(ctx, results.poseLandmarks, POSE_CONNECTIONS, {color: '#74b814', lineWidth: 3});
@@ -346,23 +331,28 @@
         function evaluatePose(lm) {
             const ex = EXERCISES[appState.training.level];
             let diff = 0;
-            let tolerance = 0.2;
+            let tolerance = 0.1;
 
-            if (ex.ref === 'front' && appState.calib.front) {
-                const sW = Math.abs(lm[11].x - lm[12].x);
-                const fW = Math.abs(lm[27].x - lm[28].x);
-                const cur = sW > 0 ? fW/sW : 0;
-                diff = Math.abs(cur - appState.calib.front.ratio);
-                tolerance = 0.25;
+            if (ex.ref === 'line' && appState.calib.line) {
+                // CHECK BALANCE (Leaning)
+                const noseX = lm[0].x;
+                const hipX = (lm[23].x + lm[24].x) / 2;
+                const bodyH = Math.abs(lm[11].y - lm[23].y);
+                const currentLean = (noseX - hipX) / (bodyH || 1);
+                
+                // Compare to reference
+                diff = Math.abs(currentLean - appState.calib.line.leanRef);
+                tolerance = 0.15; // How much leaning is okay
             } 
-            else if (ex.ref === 'side' && appState.calib.side) {
+            else if (ex.ref === 'chest' && appState.calib.chest) {
+                // CHECK ARM
                 const cur = calculateAngle(lm[11], lm[13], lm[15]);
-                diff = Math.abs(cur - appState.calib.side.bowArm);
+                diff = Math.abs(cur - appState.calib.chest.bowArm);
                 tolerance = 15;
             } 
 
             const isGood = diff < tolerance;
-            const proximity = Math.max(0, 1 - (diff / (ex.ref==='front'? 0.5 : 45)));
+            const proximity = Math.max(0, 1 - (diff / (ex.ref==='line'? 0.4 : 45)));
 
             $('prox-bar').style.width = `${proximity * 100}%`;
             $('prox-bar').className = `h-full transition-all ${isGood ? 'bg-primary' : 'bg-error shadow-[0_0_10px_red]'}`;
@@ -372,84 +362,64 @@
         }
 
         function handleLogic(isGood, proximity) {
-            // Audio Feedback Logic:
-            // Wenn GUT: Geiger aus, Sound aus. Warten auf Timer.
-            // Wenn SCHLECHT: Geiger an (schneller je näher dran).
-            
             if (isGood) {
-                stopGeiger(); // Ruhe im Ziel
-                
+                stopGeiger(); // Silence is golden (or success sound)
                 if (appState.training.holdingSince === 0) appState.training.holdingSince = Date.now();
+                
                 if (Date.now() - appState.training.holdingSince > 500) { 
-                    // SUCCESS
                     if(Date.now() - (window.lastSuccess||0) > 2000) {
                         playSuccess();
                         window.lastSuccess = Date.now();
                         appState.training.reps++;
                         updateUI();
-                        
                         speak(String(appState.training.reps));
                         
                         $('success-overlay').style.display = 'block';
                         setTimeout(() => $('success-overlay').style.display = 'none', 300);
                         appState.training.holdingSince = 0;
 
-                        if (appState.training.reps >= appState.training.maxReps) {
-                            setTimeout(finishLevel, 1000);
-                        }
+                        if (appState.training.reps >= appState.training.maxReps) setTimeout(finishLevel, 1000);
                     }
                 }
             } else {
                 appState.training.holdingSince = 0;
-                // Geiger starten: Interval wird KÜRZER je besser man ist (proximity 1 = 100ms, proximity 0 = 800ms)
-                // Pitch: Tief für Level 1, Hoch für Level 2
+                // Geiger: Faster interval if closer to target (proximity 1 -> 100ms)
                 const interval = 800 - (proximity * 600);
-                startGeiger(interval, appState.training.level === 1 ? "C2" : "C4");
+                startGeiger(interval);
             }
         }
 
-        // --- AUDIO ENGINE (GEIGER) ---
-        let membrane, polySynth, geigerLoop;
-        let nextClickTime = 0;
+        // --- AUDIO ENGINE (Geiger) ---
+        let membrane, polySynth, nextClickTime = 0;
 
         function initAudio() {
             if(membrane) return;
             Tone.start();
-            // MembraneSynth klingt wie ein tiefes "Tock" (Einparkhilfe)
-            membrane = new Tone.MembraneSynth({
-                pitchDecay: 0.05,
-                octaves: 2,
-                oscillator: { type: "sine" },
-                envelope: { attack: 0.001, decay: 0.2, sustain: 0, release: 1 }
-            }).toDestination();
-            membrane.volume.value = -5;
-            
+            membrane = new Tone.MembraneSynth().toDestination();
+            membrane.volume.value = -2; // Louder!
             polySynth = new Tone.PolySynth(Tone.Synth).toDestination();
-            polySynth.volume.value = -5;
         }
 
-        function startGeiger(interval, note) {
+        function startGeiger(interval) {
             if(!membrane) initAudio();
             const now = Tone.now();
             if(now > nextClickTime) {
-                membrane.triggerAttackRelease(note, "32n");
+                // Deep "Tock" sound
+                membrane.triggerAttackRelease("C1", "32n");
                 nextClickTime = now + (interval / 1000);
             }
         }
         
-        function stopGeiger() {
-            // Nichts zu tun, Loop basiert auf Zeitstempel
-        }
+        function stopGeiger() { } // Let loop expire
 
         function playSuccess() {
             if(polySynth) polySynth.triggerAttackRelease(["C5", "E5", "G5"], "8n");
         }
 
-        // --- TTS ---
         function initTTS() {
             if ('speechSynthesis' in window) {
-                // Stimmen laden erzwingen
-                window.speechSynthesis.getVoices(); 
+                window.speechSynthesis.onvoiceschanged = () => { window.speechSynthesis.getVoices(); };
+                window.speechSynthesis.getVoices();
                 window.speechSynthesis.speak(new SpeechSynthesisUtterance(""));
             }
         }
@@ -458,9 +428,11 @@
             if ('speechSynthesis' in window) {
                 window.speechSynthesis.cancel();
                 const u = new SpeechSynthesisUtterance(text);
-                u.lang = 'de-DE'; 
-                u.rate = 1.1;
-                u.volume = 1.0; // Max Volume
+                u.lang = 'de-DE'; u.rate = 1.1; u.volume = 1.0;
+                // Force Voice Selection if possible
+                const voices = window.speechSynthesis.getVoices();
+                const deVoice = voices.find(v => v.lang.includes('de'));
+                if(deVoice) u.voice = deVoice;
                 window.speechSynthesis.speak(u);
             }
         }
@@ -472,10 +444,7 @@
             return angle;
         }
         
-        // Sim Key S
-        document.addEventListener('keydown', e => {
-            if(e.key === 's' && appState.training.isActive) handleLogic(true, 1.0);
-        });
+        document.addEventListener('keydown', e => { if(e.key === 's') handleLogic(true, 1.0); });
     </script>
 </body>
 </html>
