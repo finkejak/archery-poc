@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>ArcherSense Skeleton Generator</title>
+  <title>ArcherSense Generator V2 (Portrait)</title>
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/control_utils/control_utils.js" crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
@@ -20,42 +20,50 @@
       font-family: sans-serif;
     }
     
-    /* Container für sauberes Seitenverhältnis */
+    /* Container füllt den Screen im Hochformat */
     .container {
       position: relative;
-      width: 1280px;
-      height: 720px;
+      width: 100vw;
+      height: 100vh;
     }
 
-    /* Video verstecken wir, wir wollen nur Analyse */
-    .input_video { display: none; }
+    /* Video verstecken */
+    .input_video { 
+        display: none; 
+        /* Wir drehen das Video-Element virtuell, falls nötig, 
+           aber MediaPipe regelt die Orientierung meist selbst gut */
+    }
 
-    /* Canvas ist unser Star */
+    /* Canvas füllt den Screen, behält aber Aspect Ratio */
     .output_canvas {
       width: 100%;
       height: 100%;
+      object-fit: cover;
       background-color: #1a2111; /* Dein App Background */
     }
 
-    /* Kleiner Hinweis */
     #status {
       position: absolute;
-      top: 20px;
+      top: 40px; /* Tiefer für Mobile Notch/Leiste */
       left: 20px;
+      right: 20px;
+      text-align: center;
       color: #74b814;
       background: rgba(0,0,0,0.7);
-      padding: 10px;
-      border-radius: 8px;
+      padding: 15px;
+      border-radius: 12px;
+      font-size: 18px;
       pointer-events: none;
+      z-index: 10;
     }
   </style>
 </head>
 
 <body>
   <div class="container">
-    <div id="status">Lade Modell... (Klick = Freeze)</div>
-    <video class="input_video"></video>
-    <canvas class="output_canvas" width="1280" height="720"></canvas>
+    <div id="status">Starte Rückkamera...</div>
+    <video class="input_video" playsinline autoplay muted></video>
+    <canvas class="output_canvas" width="1080" height="1920"></canvas>
   </div>
 
   <script type="module">
@@ -66,41 +74,33 @@
     
     let isPaused = false;
 
-    // Klick Handler für Freeze
+    // Klick Handler
     document.body.addEventListener('click', () => {
         isPaused = !isPaused;
-        statusDiv.innerText = isPaused ? "PAUSIERT (Mach jetzt den Screenshot)" : "Live Tracking...";
-        statusDiv.style.color = isPaused ? "red" : "#74b814";
-        if (!isPaused) {
-            // Wenn wir ent-pausieren, muss die Kamera wieder loslaufen, 
-            // aber Camera Utils managed das meist gut via onFrame.
-            // Wir lassen die Loop einfach weiterlaufen, blocken nur das Zeichnen nicht.
-        }
+        statusDiv.innerText = isPaused ? "PAUSIERT (Screenshot machen!)" : "Live Tracking...";
+        statusDiv.style.color = isPaused ? "#ff5555" : "#74b814";
     });
 
     function onResults(results) {
-      // Wenn pausiert, zeichnen wir einfach nicht neu (altes Bild bleibt stehen)
       if (isPaused) return;
 
-      // 1. Hintergrund säubern (Mit deiner App-Farbe füllen)
-      canvasCtx.fillStyle = '#1a2111'; 
-      // Alternativ: '#000000' für reines Schwarz wenn du es in Figma "Screenen" willst
+      // 1. Hintergrund
+      canvasCtx.fillStyle = '#1a2111'; // Oder '#000000' für Screen-Mode
       canvasCtx.fillRect(0, 0, canvasElement.width, canvasElement.height);
 
-      // 2. Skelett zeichnen
+      // 2. Skelett zeichnen (JETZT FETTER)
       if (results.poseLandmarks) {
-        // Verbindungen (Knochen) in Weiß/Hellgrau
+        // Verbindungen (Knochen)
         drawConnectors(canvasCtx, results.poseLandmarks, POSE_CONNECTIONS,
-                       {color: '#FFFFFF', lineWidth: 4}); // Dickere Linien für besseren Screenshot
+                       {color: '#FFFFFF', lineWidth: 12}); // Vorher 4 -> Jetzt 12
         
-        // Gelenke in deinem Neon-Grün
+        // Gelenke (Punkte)
         drawLandmarks(canvasCtx, results.poseLandmarks,
-                      {color: '#74b814', lineWidth: 2, radius: 6}); // Größere Punkte
+                      {color: '#74b814', lineWidth: 4, radius: 15}); // Radius 6 -> 15
       }
       
-      // Status Update beim ersten erfolgreichen Frame
-      if (statusDiv.innerText.includes("Lade")) {
-          statusDiv.innerText = "Live Tracking... (Klick zum Einfrieren)";
+      if (statusDiv.innerText.includes("Starte") || statusDiv.innerText.includes("Lade")) {
+          statusDiv.innerText = "Klick auf Screen = Pause/Freeze";
       }
     }
 
@@ -111,23 +111,45 @@
     pose.setOptions({
       modelComplexity: 1,
       smoothLandmarks: true,
-      enableSegmentation: false,
       minDetectionConfidence: 0.5,
       minTrackingConfidence: 0.5
     });
-    
     pose.onResults(onResults);
 
-    const camera = new Camera(videoElement, {
-      onFrame: async () => {
-        if (!isPaused) {
+    // Manueller Kamera-Start für Rückkamera (Environment)
+    async function startCamera() {
+        try {
+            const constraints = {
+                video: {
+                    facingMode: 'environment', // Zwingt Rückkamera
+                    width: { ideal: 1080 },
+                    height: { ideal: 1920 }
+                }
+            };
+            const stream = await navigator.mediaDevices.getUserMedia(constraints);
+            videoElement.srcObject = stream;
+            
+            // Loop starten sobald Video läuft
+            videoElement.onloadedmetadata = () => {
+                videoElement.play();
+                requestAnimationFrame(processVideo);
+            };
+        } catch (err) {
+            statusDiv.innerText = "Kamera-Fehler: " + err.name;
+            console.error(err);
+        }
+    }
+
+    // Eigene Loop statt Camera Utils (für mehr Kontrolle)
+    async function processVideo() {
+        if (!videoElement.paused && !videoElement.ended) {
             await pose.send({image: videoElement});
         }
-      },
-      width: 1280,
-      height: 720
-    });
-    camera.start();
+        // Immer weiter loopen
+        requestAnimationFrame(processVideo);
+    }
+
+    startCamera();
   </script>
 </body>
 </html>
