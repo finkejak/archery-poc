@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>ArcherSense Skeleton Generator</title>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/control_utils/control_utils.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/pose/pose.js" crossorigin="anonymous"></script>
+
+  <style>
+    body {
+      margin: 0;
+      background-color: #000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      overflow: hidden;
+      font-family: sans-serif;
+    }
+    
+    /* Container für sauberes Seitenverhältnis */
+    .container {
+      position: relative;
+      width: 1280px;
+      height: 720px;
+    }
+
+    /* Video verstecken wir, wir wollen nur Analyse */
+    .input_video { display: none; }
+
+    /* Canvas ist unser Star */
+    .output_canvas {
+      width: 100%;
+      height: 100%;
+      background-color: #1a2111; /* Dein App Background */
+    }
+
+    /* Kleiner Hinweis */
+    #status {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      color: #74b814;
+      background: rgba(0,0,0,0.7);
+      padding: 10px;
+      border-radius: 8px;
+      pointer-events: none;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <div id="status">Lade Modell... (Klick = Freeze)</div>
+    <video class="input_video"></video>
+    <canvas class="output_canvas" width="1280" height="720"></canvas>
+  </div>
+
+  <script type="module">
+    const videoElement = document.getElementsByClassName('input_video')[0];
+    const canvasElement = document.getElementsByClassName('output_canvas')[0];
+    const canvasCtx = canvasElement.getContext('2d');
+    const statusDiv = document.getElementById('status');
+    
+    let isPaused = false;
+
+    // Klick Handler für Freeze
+    document.body.addEventListener('click', () => {
+        isPaused = !isPaused;
+        statusDiv.innerText = isPaused ? "PAUSIERT (Mach jetzt den Screenshot)" : "Live Tracking...";
+        statusDiv.style.color = isPaused ? "red" : "#74b814";
+        if (!isPaused) {
+            // Wenn wir ent-pausieren, muss die Kamera wieder loslaufen, 
+            // aber Camera Utils managed das meist gut via onFrame.
+            // Wir lassen die Loop einfach weiterlaufen, blocken nur das Zeichnen nicht.
+        }
+    });
+
+    function onResults(results) {
+      // Wenn pausiert, zeichnen wir einfach nicht neu (altes Bild bleibt stehen)
+      if (isPaused) return;
+
+      // 1. Hintergrund säubern (Mit deiner App-Farbe füllen)
+      canvasCtx.fillStyle = '#1a2111'; 
+      // Alternativ: '#000000' für reines Schwarz wenn du es in Figma "Screenen" willst
+      canvasCtx.fillRect(0, 0, canvasElement.width, canvasElement.height);
+
+      // 2. Skelett zeichnen
+      if (results.poseLandmarks) {
+        // Verbindungen (Knochen) in Weiß/Hellgrau
+        drawConnectors(canvasCtx, results.poseLandmarks, POSE_CONNECTIONS,
+                       {color: '#FFFFFF', lineWidth: 4}); // Dickere Linien für besseren Screenshot
+        
+        // Gelenke in deinem Neon-Grün
+        drawLandmarks(canvasCtx, results.poseLandmarks,
+                      {color: '#74b814', lineWidth: 2, radius: 6}); // Größere Punkte
+      }
+      
+      // Status Update beim ersten erfolgreichen Frame
+      if (statusDiv.innerText.includes("Lade")) {
+          statusDiv.innerText = "Live Tracking... (Klick zum Einfrieren)";
+      }
+    }
+
+    const pose = new Pose({locateFile: (file) => {
+      return `https://cdn.jsdelivr.net/npm/@mediapipe/pose/${file}`;
+    }});
+    
+    pose.setOptions({
+      modelComplexity: 1,
+      smoothLandmarks: true,
+      enableSegmentation: false,
+      minDetectionConfidence: 0.5,
+      minTrackingConfidence: 0.5
+    });
+    
+    pose.onResults(onResults);
+
+    const camera = new Camera(videoElement, {
+      onFrame: async () => {
+        if (!isPaused) {
+            await pose.send({image: videoElement});
+        }
+      },
+      width: 1280,
+      height: 720
+    });
+    camera.start();
+  </script>
+</body>
+</html>

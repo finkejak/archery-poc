@@ -186,14 +186,14 @@
     </section>
 
     <script>
-        // --- CONFIG ---
+// --- CONFIG ---
         const EXERCISES = {
             1: { 
                 name: "Balance", 
                 focus: "KOPF STILL", 
                 ref: "line", 
                 type: "time", 
-                duration: 30, // Seconds
+                duration: 30, 
                 maxStrikes: 3 
             },
             2: { 
@@ -210,11 +210,11 @@
             wizard: { step: 'line' }, 
             training: { 
                 level: 1, 
-                reps: 0, // Used for L2
-                timeLeft: 30, // Used for L1
-                strikes: 0, // Used for L1
+                reps: 0, 
+                timeLeft: 30, 
+                strikes: 0, 
                 isActive: false,
-                lastErrorTime: 0 // Cooldown for error sound
+                lastErrorTime: 0 
             }
         };
 
@@ -231,22 +231,16 @@
             $(`screen-${id}`).classList.add('active');
         }
 
-        function startWizard() {
-            initTTS(); 
-            appState.wizard.step = 'line';
-            updateWizardUI();
-            showScreen('wiz-intro');
-        }
-
+        // ... (Wizard Funktionen bleiben gleich wie V8) ...
+        function startWizard() { initTTS(); appState.wizard.step = 'line'; updateWizardUI(); showScreen('wiz-intro'); }
         function updateWizardUI() {
             const isLine = appState.wizard.step === 'line';
             $('wiz-title').innerText = isLine ? "Schritt 1: Schusslinie" : "Schritt 2: Frontal (Bauch)";
             $('wiz-desc').innerText = isLine 
-                ? "Stelle dich auf die Schusslinie. Die Kamera sieht deine Schulter (Profil)." 
-                : "Dreh dich zur Kamera (90°). Die Kamera sieht deinen Brustkorb/Bauch.";
+                ? "Stelle dich auf die Schusslinie. Wir messen deine Balance." 
+                : "Dreh dich zur Kamera (90°). Wir messen deinen Armwinkel.";
             $('wiz-input').value = "";
         }
-
         function nextWizardStep(target) { showScreen(`wiz-${target}`); }
         function prevWizardStep() { showScreen('wiz-intro'); }
         function confirmWizardStep() {
@@ -257,11 +251,10 @@
             } else { showScreen('home'); }
         }
 
-        // --- CALIBRATION ---
+        // ... (Calibration Logic bleibt gleich wie V8) ...
         const poseStatic = new Pose({locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/pose/${file}`});
         poseStatic.setOptions({modelComplexity: 1});
         poseStatic.onResults(handleWizResults);
-
         $('wiz-input').addEventListener('change', (e) => {
             const file = e.target.files[0];
             if(file) {
@@ -271,11 +264,9 @@
                 img.onload = () => poseStatic.send({image: img});
             }
         });
-
         function handleWizResults(results) {
             $('wiz-loading').classList.add('hidden');
             if(!results.poseLandmarks) { alert("Keine Person erkannt."); return; }
-
             const lm = results.poseLandmarks;
             if (appState.wizard.step === 'line') {
                 const noseX = lm[0].x;
@@ -290,8 +281,8 @@
             showScreen('wiz-verify');
         }
 
-        // --- TRAINING ---
-        function startTrainingFlow() { showScreen('safety'); speak("Achte auf Sicherheit."); }
+        // --- TRAINING FLOW ---
+        function startTrainingFlow() { showScreen('safety'); speak("Sicherheit beachten."); }
         function setLevel(lvl) { appState.training.level = lvl; startTrainingFlow(); }
         function confirmSafety() { showScreen('live'); startLiveSession(); }
         
@@ -302,26 +293,33 @@
         }
 
         function finishLevel(success) {
-            appState.training.isActive = false;
-            stopAudio();
+            // WICHTIG: isActive NICHT auf false setzen, damit Video weiterläuft!
+            // Wir stoppen nur die Logik-Auswertung.
+            stopAudio(); 
             
             if(success) {
                 playSuccess();
-                speak("Übung erfolgreich beendet.");
+                speak("Übung geschafft.");
                 $('summary-title').innerText = "Geschafft!";
                 $('summary-title').className = "text-3xl font-bold mb-2 text-primary";
                 $('summary-icon').innerText = "emoji_events";
                 $('summary-icon-bg').className = "size-32 rounded-full border-4 border-primary flex items-center justify-center mb-6 relative shadow-[0_0_20px_rgba(116,184,20,0.3)]";
-                $('summary-text').innerText = appState.training.level === 1 ? "Du hast 30 Sekunden stabil gestanden." : "5 saubere Wiederholungen.";
+                $('summary-text').innerText = "Du hast die Position stabil gehalten.";
             } else {
-                playError(); // Low Error
-                speak("Versuch fehlgeschlagen.");
-                $('summary-title').innerText = "Fehlgeschlagen";
+                playError(); 
+                speak("Leider nicht geschafft.");
+                $('summary-title').innerText = "Versuch's nochmal";
                 $('summary-title').className = "text-3xl font-bold mb-2 text-error";
-                $('summary-icon').innerText = "sentiment_dissatisfied";
+                $('summary-icon').innerText = "replay";
                 $('summary-icon-bg').className = "size-32 rounded-full border-4 border-error flex items-center justify-center mb-6 relative shadow-[0_0_20px_rgba(239,68,68,0.3)]";
-                $('summary-text').innerText = "Du hast zu oft gewackelt. Versuch es nochmal.";
+                $('summary-text').innerText = "Zu viele Wackler. Achte auf deine Balance.";
             }
+            
+            // Zeige Summary als Overlay, aber lass Live-View drunter
+            // Wir "pausieren" nur die Logik
+            appState.training.isActive = false; 
+            // Video Loop läuft weiter, aber sendet keine Daten mehr an Logic
+            
             showScreen('summary');
         }
 
@@ -331,17 +329,16 @@
         poseLive.onResults(onLiveResults);
 
         async function startLiveSession() {
-            // Reset State
             appState.training.isActive = true;
             const ex = EXERCISES[appState.training.level];
             
             if (ex.type === 'time') {
                 appState.training.timeLeft = ex.duration;
                 appState.training.strikes = 0;
-                $('counter-label').innerText = "ZEIT";
+                $('counter-label').innerText = "ZEIT (HALTEN)";
                 $('strikes-container').classList.remove('hidden');
                 updateStrikesUI();
-                startTimer();
+                // Timer wird jetzt in handleLogic gesteuert!
             } else {
                 appState.training.reps = 0;
                 $('counter-label').innerText = "REPS";
@@ -352,7 +349,7 @@
             updateUI();
             
             $('focus-text').innerText = ex.focus;
-            speak(`Start. Fokus: ${ex.focus}`);
+            speak(`Fokus: ${ex.focus}`);
             
             initAudio();
             startCameraStream();
@@ -361,36 +358,17 @@
         function updateUI() {
             const ex = EXERCISES[appState.training.level];
             if (ex.type === 'time') {
-                $('main-counter').innerHTML = `${appState.training.timeLeft}<span class="text-2xl text-gray-600 font-normal">s</span>`;
+                $('main-counter').innerHTML = `${Math.ceil(appState.training.timeLeft)}<span class="text-2xl text-gray-600 font-normal">s</span>`;
             } else {
                 $('main-counter').innerHTML = `${appState.training.reps}<span class="text-2xl text-gray-600 font-normal">/5</span>`;
             }
         }
 
         function updateStrikesUI() {
-            // Reset colors
             ['strike-1', 'strike-2', 'strike-3'].forEach(id => $(id).className = "size-3 rounded-full bg-gray-600");
-            // Mark errors (Red)
             for(let i=0; i<appState.training.strikes; i++) {
                 if(i < 3) $(`strike-${i+1}`).className = "size-3 rounded-full bg-error shadow-[0_0_5px_red]";
             }
-        }
-
-        let timerInterval;
-        function startTimer() {
-            if(timerInterval) clearInterval(timerInterval);
-            timerInterval = setInterval(() => {
-                if(!appState.training.isActive) { clearInterval(timerInterval); return; }
-                
-                if(EXERCISES[appState.training.level].type === 'time') {
-                    appState.training.timeLeft--;
-                    updateUI();
-                    if(appState.training.timeLeft <= 0) {
-                        clearInterval(timerInterval);
-                        finishLevel(true); // Success
-                    }
-                }
-            }, 1000);
         }
 
         async function startCameraStream() {
@@ -404,9 +382,14 @@
         }
 
         async function processLoop() {
-            if(appState.training.isActive) {
-                if(video.readyState >= 2) await poseLive.send({image: video});
-                requestAnimationFrame(processLoop);
+            // Der Loop läuft IMMER, auch wenn isActive false ist (für Hintergrund)
+            // Aber wir senden nur an MediaPipe wenn aktiv oder wir Hintergrund wollen
+            if(video.readyState >= 2) {
+                // Sende immer für Visuals, aber Logik stoppen wir intern
+                await poseLive.send({image: video});
+            }
+            if($('screen-live').classList.contains('active')) {
+                 requestAnimationFrame(processLoop);
             }
         }
 
@@ -415,12 +398,16 @@
             ctx.clearRect(0,0,canvas.width,canvas.height);
             
             if(results.poseLandmarks) {
+                // Zeichnen immer (damit kein "Freeze" Gefühl entsteht)
                 drawConnectors(ctx, results.poseLandmarks, POSE_CONNECTIONS, {color: '#000000', lineWidth: 6});
                 drawLandmarks(ctx, results.poseLandmarks, {color: '#000000', lineWidth: 6});
                 drawConnectors(ctx, results.poseLandmarks, POSE_CONNECTIONS, {color: '#74b814', lineWidth: 3});
                 drawLandmarks(ctx, results.poseLandmarks, {color: '#FFFFFF', lineWidth: 2});
                 
-                evaluatePose(results.poseLandmarks);
+                // Logik nur wenn Training aktiv
+                if(appState.training.isActive) {
+                    evaluatePose(results.poseLandmarks);
+                }
             }
         }
 
@@ -431,55 +418,77 @@
             let diff = 0;
 
             if (ex.ref === 'line' && appState.calib.line) {
-                // LEVEL 1: BALANCE (Strict!)
+                // BALANCE
                 const noseX = lm[0].x;
                 const hipX = (lm[23].x + lm[24].x) / 2;
                 const bodyH = Math.abs(lm[11].y - lm[23].y);
                 const currentLean = (noseX - hipX) / (bodyH || 1);
-                
                 diff = Math.abs(currentLean - appState.calib.line.leanRef);
-                tolerance = 0.08; // STRIKTER (vorher 0.15)
-                
+                tolerance = 0.08; 
                 isGood = diff < tolerance;
 
             } else if (ex.ref === 'chest' && appState.calib.chest) {
-                // LEVEL 2: ARM
+                // ARM
                 const cur = calculateAngle(lm[11], lm[13], lm[15]);
                 diff = Math.abs(cur - appState.calib.chest.bowArm);
                 tolerance = 15;
                 isGood = diff < tolerance;
             }
 
-            // Logic Split
             if(ex.type === 'time') {
                 handleTimeLogic(isGood);
             } else {
-                handleRepLogic(isGood, diff, tolerance);
+                handleRepLogic(isGood, diff);
             }
         }
 
+        // --- NEW TIME LOGIC (SMART TIMER) ---
+        let lastTimeCheck = 0;
+        
         function handleTimeLogic(isGood) {
-            // DRONE ALWAYS ON (Humming)
-            if(!drone) initAudio();
+            const now = Date.now();
             
+            if(!drone) initAudio();
+
             if(isGood) {
-                drone.volume.rampTo(-10, 0.1); // Angenehm
-                $('debug-text').innerText = "Haltung gut";
+                // Haltung GUT -> Timer läuft
+                drone.volume.rampTo(-15, 0.1); // Leises Hintergrund-Summen
+                $('debug-text').innerText = "Haltung gut - Zeit läuft";
                 $('debug-text').className = "text-sm text-green-400 mb-2 font-mono";
-            } else {
-                drone.volume.rampTo(-15, 0.1); // Etwas leiser bei Fehler? Oder andersrum.
-                $('debug-text').innerText = "KORRIGIEREN!";
-                $('debug-text').className = "text-sm text-error mb-2 font-bold font-mono";
+                $('prox-bar').className = "h-full bg-primary transition-all";
+                $('prox-bar').style.width = "100%";
+
+                // Timer abziehen (Delta Time)
+                if(lastTimeCheck === 0) lastTimeCheck = now;
+                const delta = (now - lastTimeCheck) / 1000;
                 
-                // ERROR LOGIC
-                const now = Date.now();
-                if (now - appState.training.lastErrorTime > 2000) { // 2s Buffer
+                if(delta > 0.1) { // Nur updaten alle 100ms
+                    appState.training.timeLeft -= delta;
+                    updateUI();
+                    lastTimeCheck = now;
+                }
+
+                if(appState.training.timeLeft <= 0) {
+                    finishLevel(true);
+                }
+
+            } else {
+                // Haltung SCHLECHT -> Timer PAUSIERT
+                lastTimeCheck = 0; // Reset Delta
+                
+                drone.volume.rampTo(-10, 0.1); // Etwas lauter als Warnung
+                $('debug-text').innerText = "STOPP - Korrigieren!";
+                $('debug-text').className = "text-sm text-error mb-2 font-bold font-mono animate-pulse";
+                $('prox-bar').className = "h-full bg-error shadow-[0_0_10px_red] transition-all";
+                $('prox-bar').style.width = "100%";
+                
+                // Fehler zählen
+                if (now - appState.training.lastErrorTime > 2000) { 
                     playError();
                     appState.training.strikes++;
                     appState.training.lastErrorTime = now;
                     updateStrikesUI();
                     
-                    // Fail Check
                     if(appState.training.strikes >= EXERCISES[1].maxStrikes) {
                         finishLevel(false);
                     }
@@ -487,14 +496,14 @@
             }
         }
 
-        function handleRepLogic(isGood, diff, tolerance) {
-             // ... Alte Logik für Level 2 (Balken etc)
+        function handleRepLogic(isGood, diff) {
              const proximity = Math.max(0, 1 - (diff / 45));
              $('prox-bar').style.width = `${proximity * 100}%`;
-             $('prox-bar').className = `h-full transition-all ${isGood ? 'bg-primary' : 'bg-error shadow-[0_0_10px_red]'}`;
              
              if(isGood) {
+                 $('prox-bar').className = "h-full bg-primary transition-all";
                  if(appState.training.holdingSince === 0) appState.training.holdingSince = Date.now();
+                 
                  if(Date.now() - appState.training.holdingSince > 500) {
                      if(Date.now() - (window.lastSuccess||0) > 2000) {
                          playSuccess();
@@ -506,69 +515,50 @@
                      }
                  }
              } else {
+                 $('prox-bar').className = "h-full bg-error transition-all";
                  appState.training.holdingSince = 0;
-                 // Geiger für Level 2
-                 const interval = 800 - (proximity * 600);
-                 startGeiger(interval);
              }
         }
 
-        // --- AUDIO ENGINE V3 ---
-        let drone, membrane, polySynth, nextClickTime = 0;
+        // --- AUDIO ENGINE V4 (Pleasant Drone) ---
+        let drone, membrane, polySynth, filter;
 
         function initAudio() {
             if(drone) return;
             Tone.start();
             
-            // 1. DRONE (Dauerton) - Tief, beruhigend (Triangle/Sine)
-            drone = new Tone.Oscillator(100, "triangle").toDestination();
-            drone.volume.value = -Infinity; // Start stumm
+            // Filter für weicheren Sound (LowPass)
+            filter = new Tone.Filter(200, "lowpass").toDestination();
+            
+            // Drone: PulseWave klingt technischer aber weicher als Sawtooth
+            drone = new Tone.PulseOscillator(50, 0.4).connect(filter); 
+            drone.volume.value = -Infinity; 
             drone.start();
-            drone.volume.rampTo(-10, 1); // Fade in
+            drone.volume.rampTo(-15, 2); // Slow Fade In
 
-            // 2. ERROR (Deep Impact)
             membrane = new Tone.MembraneSynth().toDestination();
-            membrane.volume.value = 0; 
+            membrane.volume.value = -2; 
 
-            // 3. SUCCESS / GEIGER
             polySynth = new Tone.PolySynth(Tone.Synth).toDestination();
+            polySynth.volume.value = -5;
         }
 
         function stopAudio() {
-            if(drone) drone.volume.rampTo(-Infinity, 0.5);
+            if(drone) drone.volume.rampTo(-Infinity, 1);
         }
 
-        function playError() {
-            // Tiefer, warnender Sound
-            if(membrane) membrane.triggerAttackRelease("G1", "8n");
-        }
+        function playError() { if(membrane) membrane.triggerAttackRelease("C1", "8n"); }
+        function playSuccess() { if(polySynth) polySynth.triggerAttackRelease(["C5", "E5", "G5"], "8n"); }
 
-        function playSuccess() {
-            if(polySynth) polySynth.triggerAttackRelease(["C5", "E5", "G5"], "8n");
-        }
-        
-        function startGeiger(interval) {
-            // Nur für Level 2 (Reps)
-            if(!membrane) initAudio();
-            const now = Tone.now();
-            if(now > nextClickTime) {
-                membrane.triggerAttackRelease("C2", "32n"); // Höher als Fehler
-                nextClickTime = now + (interval / 1000);
-            }
-        }
-
-        // --- HELPER ---
-        function initTTS() {
-            if ('speechSynthesis' in window) {
-                window.speechSynthesis.getVoices();
-                window.speechSynthesis.speak(new SpeechSynthesisUtterance(""));
-            }
-        }
+        // --- HELPERS ---
+        function initTTS() { if ('speechSynthesis' in window) window.speechSynthesis.getVoices(); }
         function speak(text) {
             if ('speechSynthesis' in window) {
                 window.speechSynthesis.cancel();
                 const u = new SpeechSynthesisUtterance(text);
                 u.lang = 'de-DE'; u.rate = 1.1;
+                const v = window.speechSynthesis.getVoices().find(v => v.lang.includes('de'));
+                if(v) u.voice = v;
                 window.speechSynthesis.speak(u);
             }
         }
@@ -578,7 +568,6 @@
             if (angle > 180.0) angle = 360 - angle;
             return angle;
         }
-        document.addEventListener('keydown', e => { if(e.key === 's') appState.training.reps++; });
-    </script>
+        document.addEventListener('keydown', e => { if(e.key === 's') appState.training.reps++; });    </script>
 </body>
 </html>
