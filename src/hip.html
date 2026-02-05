@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>ArcherAI - Hip Stability Prototype</title>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/control_utils/control_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/pose/pose.js" crossorigin="anonymous"></script>
+
+    <style>
+        body { margin: 0; background: #000; overflow: hidden; font-family: sans-serif; }
+        
+        /* Container für Video und Canvas */
+        .container { position: relative; width: 100vw; height: 100vh; display: flex; justify-content: center; align-items: center; }
+        
+        /* Video verstecken, wir zeichnen auf Canvas */
+        .input_video { display: none; }
+        
+        /* Das Canvas, auf dem wir zeichnen */
+        .output_canvas { width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); /* Spiegeln für "Spiegel"-Effekt */ }
+
+        /* Die rote Vignette (Fehler-Indikator) */
+        .vignette {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none;
+            box-shadow: inset 0 0 0 0 rgba(255, 0, 0, 0);
+            transition: box-shadow 0.2s ease-out;
+            z-index: 10;
+        }
+        
+        /* Aktivierte Vignette */
+        .vignette.active {
+            box-shadow: inset 0 0 100px 50px rgba(255, 0, 0, 0.8);
+            border: 4px solid red;
+        }
+
+        /* Start Button (nötig für Audio Context) */
+        #startBtn {
+            position: absolute; z-index: 20; top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 20px 40px; font-size: 24px; background: #74b814; color: #fff;
+            border: none; border-radius: 8px; cursor: pointer;
+        }
+        
+        /* Debug Info */
+        #debug {
+            position: absolute; bottom: 20px; left: 20px; color: #74b814;
+            font-size: 16px; z-index: 20; background: rgba(0,0,0,0.5); padding: 5px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <video class="input_video"></video>
+    <canvas class="output_canvas" width="1280" height="720"></canvas>
+    <div class="vignette" id="errorVignette"></div>
+    <button id="startBtn">Kamera & Audio starten</button>
+    <div id="debug">Warte auf Start...</div>
+</div>
+
+<script>
+    const videoElement = document.getElementsByClassName('input_video')[0];
+    const canvasElement = document.getElementsByClassName('output_canvas')[0];
+    const canvasCtx = canvasElement.getContext('2d');
+    const vignette = document.getElementById('errorVignette');
+    const startBtn = document.getElementById('startBtn');
+    const debugDiv = document.getElementById('debug');
+
+    // --- AUDIO SETUP (Web Audio API für "Da-Dum") ---
+    let audioCtx;
+    let synthStarted = false;
+
+    // TTS Setup
+    const msg = new SpeechSynthesisUtterance("Hüfte");
+    msg.lang = 'de-DE';
+    msg.rate = 1.2; // Etwas schneller
+
+    // Cooldown Variablen, damit es nicht spammt
+    let lastErrorTime = 0;
+    const errorCooldown = 2000; // 2 Sekunden Pause zwischen Fehlern
+
+    // Funktion für den "Da-Dum" Sound
+    function playErrorSound() {
+        if (!audioCtx) return;
+        const oscillator = audioCtx.createOscillator();
+        const gainNode = audioCtx.createGain();
+        
+        oscillator.connect(gainNode);
+        gainNode.connect(audioCtx.destination);
+        
+        // "Da" (Tiefer Ton)
+        oscillator.type = 'sawtooth';
+        oscillator.frequency.setValueAtTime(150, audioCtx.currentTime); 
+        // "Dum" (Noch tiefer, abfallend)
+        oscillator.frequency.exponentialRampToValueAtTime(80, audioCtx.currentTime + 0.15);
+        
+        gainNode.gain.setValueAtTime(0.5, audioCtx.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+
+        oscillator.start();
+        oscillator.stop(audioCtx.currentTime + 0.3);
+    }
+
+    function triggerFeedback() {
+        const now = Date.now();
+        if (now - lastErrorTime > errorCooldown) {
+            // Audio abspielen
+            playErrorSound();
+            
+            // TTS Sprechen (kurz verzögert nach dem Sound)
+            setTimeout(() => {
+                window.speechSynthesis.speak(msg);
+            }, 200);
+
+            lastErrorTime = now;
+        }
+        
+        // Visuell: Vignette an
+        vignette.classList.add('active');
+    }
+
+    function resetFeedback() {
+        // Visuell: Vignette aus
+        vignette.classList.remove('active');
+    }
+
+    // --- MEDIAPIPE LOGIK ---
+    
+    function onResults(results) {
+        // Canvas leeren und Video Frame zeichnen
+        canvasCtx.save();
+        canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+        
+        // Zeichne das Kamerabild leicht abgedunkelt (für "Dark Mode" Feeling)
+        canvasCtx.filter = 'brightness(50%)'; 
+        canvasCtx.drawImage(results.image, 0, 0, canvasElement.width, canvasElement.height);
+        canvasCtx.filter = 'none';
+
+        if (results.poseLandmarks) {
+            const lm = results.poseLandmarks;
+
+            // 1. Hüft-Rotation erkennen
+            // Wir nutzen die Z-Koordinate (Tiefe). Wenn eine Hüfte deutlich vor der anderen ist, rotiert der Nutzer.
+            // Z-Werte sind relativ.
+            const leftHipZ = lm[23].z;
+            const rightHipZ = lm[24].z;
+            const diffZ = Math.abs(leftHipZ - rightHipZ);
+
+            // Toleranz-Wert (Hier anpassen, wenn es zu empfindlich/unempfindlich ist!)
+            // 0.15 ist ein guter Mittelwert für Rotation
+            const threshold = 0.15; 
+            
+            const isError = diffZ > threshold;
+
+            if (isError) {
+                triggerFeedback();
+                debugDiv.innerText = "Fehler: Hüfte rotiert! (" + diffZ.toFixed(2) + ")";
+            } else {
+                resetFeedback();
+                debugDiv.innerText = "Status: Stabil (" + diffZ.toFixed(2) + ")";
+            }
+
+            // 2. Skelett zeichnen (Geteilt: Oben Grün, Unten Dynamisch)
+            
+            // Definiere Verbindungen
+            const upperBody = [
+                [11, 12], [11, 13], [13, 15], [12, 14], [14, 16], // Arme & Schultern
+                [11, 23], [12, 24] // Torso Seiten
+            ];
+            
+            const lowerBody = [
+                [23, 24], // Hüftverbindung
+                [23, 25], [24, 26], // Oberschenkel
+                [25, 27], [26, 28], // Unterschenkel
+                [27, 29], [28, 30], [29, 31], [30, 32] // Füße
+            ];
+
+            // Farbe für unten festlegen
+            const lowerColor = isError ? '#FF0000' : '#74b814'; // Rot oder Neon-Grün
+            const upperColor = '#74b814'; // Immer Neon-Grün
+            const lineWidth = 4;
+
+            // Funktion zum Zeichnen von Linien
+            function drawConn(pairs, color) {
+                canvasCtx.strokeStyle = color;
+                canvasCtx.lineWidth = lineWidth;
+                for (let pair of pairs) {
+                    const p1 = lm[pair[0]];
+                    const p2 = lm[pair[1]];
+                    // Nur zeichnen, wenn beide Punkte im Bild sind (visibility check optional)
+                    if(p1 && p2) {
+                        canvasCtx.beginPath();
+                        canvasCtx.moveTo(p1.x * canvasElement.width, p1.y * canvasElement.height);
+                        canvasCtx.lineTo(p2.x * canvasElement.width, p2.y * canvasElement.height);
+                        canvasCtx.stroke();
+                    }
+                }
+            }
+
+            // Zeichnen
+            drawConn(upperBody, upperColor);
+            drawConn(lowerBody, lowerColor);
+
+            // Gelenke (Kreise) zeichnen
+            for (let i = 0; i < 33; i++) {
+                const x = lm[i].x * canvasElement.width;
+                const y = lm[i].y * canvasElement.height;
+                
+                canvasCtx.beginPath();
+                // Oben grün, Unten Rot bei Fehler (Hüfte abwärts = Index 23+)
+                canvasCtx.fillStyle = (i >= 23 && isError) ? '#FF0000' : '#FFFFFF';
+                // Hüftgelenke hervorheben
+                if (i == 23 || i == 24) {
+                    canvasCtx.arc(x, y, 8, 0, 2 * Math.PI);
+                } else {
+                    canvasCtx.arc(x, y, 5, 0, 2 * Math.PI);
+                }
+                canvasCtx.fill();
+            }
+        }
+        canvasCtx.restore();
+    }
+
+    // --- SETUP & START ---
+    
+    const pose = new Pose({locateFile: (file) => {
+        return `https://cdn.jsdelivr.net/npm/@mediapipe/pose/${file}`;
+    }});
+
+    pose.setOptions({
+        modelComplexity: 1,
+        smoothLandmarks: true,
+        enableSegmentation: false,
+        minDetectionConfidence: 0.5,
+        minTrackingConfidence: 0.5
+    });
+
+    pose.onResults(onResults);
+
+    startBtn.addEventListener('click', () => {
+        // Audio Context initialisieren (muss nach User-Geste passieren)
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        startBtn.style.display = 'none'; // Button weg
+        debugDiv.innerText = "Lade Modell...";
+
+        // Kamera starten
+        const camera = new Camera(videoElement, {
+            onFrame: async () => {
+                await pose.send({image: videoElement});
+            },
+            width: 1280,
+            height: 720
+        });
+        camera.start();
+    });
+
+</script>
+</body>
+</html>
